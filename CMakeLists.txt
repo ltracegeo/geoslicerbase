@@ -86,6 +86,21 @@ if(WIN32)
   option(Slicer_BUILD_WIN32_CONSOLE             "Build application executable as a console app"       OFF)
 endif()
 
+option(Slicer_BUILD_DICOM_SUPPORT               "Build application with DICOM support"                ON)
+option(Slicer_BUILD_DIFFUSION_SUPPORT           "Build application with Diffusion support"            ON)
+option(Slicer_BUILD_EXTENSIONMANAGER_SUPPORT    "Build application with ExtensionManager support"     ON)
+option(Slicer_BUILD_MULTIVOLUME_SUPPORT         "Build application with MultiVolume support"          ON)
+option(Slicer_BUILD_PARAMETERSERIALIZER_SUPPORT "Build application with parameter serializer support" ON)
+option(Slicer_USE_PYTHONQT                      "Build application with Python support"               ON)
+option(Slicer_USE_SimpleITK                     "Build application with SimpleITK support"            ON)
+
+option(Slicer_BUILD_BRAINSTOOLS                 "Build application with BRAINSTools module"           ON)
+option(Slicer_BUILD_DataStore                   "Build application with DataStore module"             ON)
+option(Slicer_BUILD_CompareVolumes              "Build application with ChangeTrackerPy module"       ON)
+option(Slicer_BUILD_LandmarkRegistration        "Build application with LandmarkRegistration module"  ON)
+option(Slicer_BUILD_SurfaceToolbox              "Build application with SurfaceToolbox module"        ON)
+option(Slicer_BUILD_WEBENGINE_SUPPORT			"Build application with webengine support"       	  ON)
+
 # Enable Slicer built-in modules
 # set(Slicer_CLIMODULES_ENABLED
   # ResampleDTIVolume             # Needed by ResampleScalarVectorDWIVolume
