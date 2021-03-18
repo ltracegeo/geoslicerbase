@@ -26,7 +26,7 @@ Note: The build process will take approximately 3 hours.
 
 Slicer sources will be checked out automatically according to the git repo and tag indicated on CMakeLists
 
-<b>Option 1: CMake GUI and Visual Studio (Recommended)</b>
+**CMake GUI and Visual Studio (Recommended)**
 
 1. Start [CMake GUI](https://cmake.org/runningcmake/), select source directory as this repo folder and set build directory to `C:\GeoSlicerBuild`.
 2. Add an entry `Qt5_DIR` pointing to `C:/Qt/${QT_VERSION}/${COMPILER}/lib/cmake/Qt5`.
@@ -38,9 +38,11 @@ Slicer sources will be checked out automatically according to the git repo and t
 Note: if xeus and xeus-python does not build. add the respective includes to the CMakeLists
 
 xeus:
-	include_directories("../OpenSSL-install/Release/include")
+
+    include_directories("../OpenSSL-install/Release/include")
 
 xeus-python:
+
 	include_directories("../OpenSSL-install/Release/include")
 	include_directories("../pybind11/include")
 	include_directories("../pybind11_json/include")
@@ -52,6 +54,6 @@ Package
 
 Install [NSIS 2](http://sourceforge.net/projects/nsis/files/)
 
-<b>Option 1: CMake and Visual Studio (Recommended)</b>
+**CMake and Visual Studio**
 
 1. In the `C:\GeoSlicerBuild\Slicer-build` directory, open `Slicer.sln` and build the `PACKAGE` target
