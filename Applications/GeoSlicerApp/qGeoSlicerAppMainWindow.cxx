@@ -81,14 +81,14 @@ void qGeoSlicerAppMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   this->LogoLabel->setPixmap(logo);
 
   // Hide the toolbars
-  this->MainToolBar->setVisible(false);
+  // this->MainToolBar->setVisible(false);
   //this->ModuleSelectorToolBar->setVisible(false);
-  this->ModuleToolBar->setVisible(false);
-  this->ViewToolBar->setVisible(false);
-  this->MouseModeToolBar->setVisible(false);
-  this->CaptureToolBar->setVisible(false);
-  this->ViewersToolBar->setVisible(false);
-  this->DialogToolBar->setVisible(false);
+  // this->ModuleToolBar->setVisible(false);
+  // this->ViewToolBar->setVisible(false);
+  // this->MouseModeToolBar->setVisible(false);
+  // this->CaptureToolBar->setVisible(false);
+  // this->ViewersToolBar->setVisible(false);
+  // this->DialogToolBar->setVisible(false);
 
   // Hide the menus
   //this->menubar->setVisible(false);
@@ -100,9 +100,9 @@ void qGeoSlicerAppMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 
   // Hide the modules panel
   //this->PanelDockWidget->setVisible(false);
-  this->DataProbeCollapsibleWidget->setCollapsed(true);
-  this->DataProbeCollapsibleWidget->setVisible(false);
-  this->StatusBar->setVisible(false);
+  // this->DataProbeCollapsibleWidget->setCollapsed(true);
+  // this->DataProbeCollapsibleWidget->setVisible(false);
+  // this->StatusBar->setVisible(false);
 }
 
 //-----------------------------------------------------------------------------

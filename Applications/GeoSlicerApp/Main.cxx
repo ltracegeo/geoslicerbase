@@ -22,6 +22,7 @@
 // Slicer includes
 #include "qSlicerApplication.h"
 #include "qSlicerApplicationHelper.h"
+#include "qSlicerStyle.h"
 
 namespace
 {
@@ -30,8 +31,9 @@ namespace
 int SlicerAppMain(int argc, char* argv[])
 {
   typedef qGeoSlicerAppMainWindow SlicerMainWindowType;
-
-  qSlicerApplicationHelper::preInitializeApplication(argv[0], new qAppStyle);
+  typedef qSlicerStyle SlicerAppStyle;
+  
+  qSlicerApplicationHelper::preInitializeApplication(argv[0], new SlicerAppStyle);
 
   qSlicerApplication app(argc, argv);
   if (app.returnCode() != -1)

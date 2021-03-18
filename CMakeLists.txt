@@ -13,7 +13,7 @@ if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
     GIT_REPOSITORY git@bitbucket.org:ltrace/slicer.git
-    GIT_TAG        d5e62f8204efdbae4f5ce54bfc354d4715f3faf2
+    GIT_TAG        612b90e645cd48dd8a2d6b53e1eaf417e668ed76
     GIT_PROGRESS   1
     )
 else()
@@ -35,8 +35,8 @@ set(Slicer_ORGANIZATION_DOMAIN "ltrace.com.br")
 set(Slicer_ORGANIZATION_NAME   "LTrace")
 
 # Default home and favorite modules
-set(Slicer_DEFAULT_HOME_MODULE "Home")
-set(Slicer_DEFAULT_FAVORITE_MODULES "Data, Volumes, Models, Transforms, Markups, SegmentEditor")
+#set(Slicer_DEFAULT_HOME_MODULE "Home")
+#set(Slicer_DEFAULT_FAVORITE_MODULES "Data, Volumes, Models, Transforms, Markups, SegmentEditor")
 
 # Configure SuperBuild
 set(SUPERBUILD_TOPLEVEL_PROJECT Slicer)
@@ -66,7 +66,7 @@ endif()
 if(WIN32)
   # Note: To avoid escaping issue, make sure to use forward slash when setting
   #       "Slicer_CPACK_NSIS_INSTALL_ROOT". It is replaced by "\\\\" in SlicerCPack.
-  set(Slicer_CPACK_NSIS_INSTALL_REQUIRES_ADMIN_ACCOUNT ON)
+  set(Slicer_CPACK_NSIS_INSTALL_REQUIRES_ADMIN_ACCOUNT OFF)
   if(Slicer_CPACK_NSIS_INSTALL_REQUIRES_ADMIN_ACCOUNT)
     # User has administrative privileges, therefore we can install to shared folder
     # "C:\Program Files" or "C:\Program Files (x86)".
@@ -99,7 +99,7 @@ option(Slicer_BUILD_DataStore                   "Build application with DataStor
 option(Slicer_BUILD_CompareVolumes              "Build application with ChangeTrackerPy module"       ON)
 option(Slicer_BUILD_LandmarkRegistration        "Build application with LandmarkRegistration module"  ON)
 option(Slicer_BUILD_SurfaceToolbox              "Build application with SurfaceToolbox module"        ON)
-option(Slicer_BUILD_WEBENGINE_SUPPORT			"Build application with webengine support"       	  ON)
+option(Slicer_BUILD_WEBENGINE_SUPPORT           "Build application with webengine support"            ON)
 
 # Enable Slicer built-in modules
 # set(Slicer_CLIMODULES_ENABLED
@@ -123,7 +123,7 @@ option(Slicer_BUILD_WEBENGINE_SUPPORT			"Build application with webengine suppor
 set(Slicer_EXTENSION_SOURCE_DIRS
   #${GeoSlicer_SOURCE_DIR}/Modules/CLI/MyCLIModule
   #${GeoSlicer_SOURCE_DIR}/Modules/Loadable/MyLoadableModule
-  ${GeoSlicer_SOURCE_DIR}/Modules/Scripted/Home
+  #${GeoSlicer_SOURCE_DIR}/Modules/Scripted/Home
   )
 
 # Add remote extension source directories
