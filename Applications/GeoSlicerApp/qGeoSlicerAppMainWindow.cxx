@@ -78,7 +78,7 @@ void qGeoSlicerAppMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   mainWindow->setWindowIcon(QIcon(":/Icons/Medium/DesktopIcon.png"));
 
   QPixmap logo(":/LogoFull.png");
-  this->LogoLabel->setPixmap(logo);
+  this->LogoLabel->setVisible(false);
 
   // Hide the toolbars
   // this->MainToolBar->setVisible(false);
