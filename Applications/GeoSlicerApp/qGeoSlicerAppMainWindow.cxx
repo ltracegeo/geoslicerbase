@@ -21,12 +21,21 @@
 
 // Qt includes
 #include <QDesktopWidget>
+#include <QDesktopServices>
+#include <QPixmap>
+#include <QStyle>
+#include <QUrl>
 
 // Slicer includes
 #include "qSlicerApplication.h"
 #include "qSlicerAboutDialog.h"
 #include "qSlicerMainWindow_p.h"
 #include "qSlicerModuleSelectorToolBar.h"
+#include "qSlicerAbstractModule.h"
+#include "qSlicerActionsDialog.h"
+#include "qSlicerErrorReportDialog.h"
+#include "qSlicerModuleManager.h"
+#include "vtkSlicerVersionConfigure.h" // For Slicer_VERSION_MAJOR,Slicer_VERSION_MINOR
 
 //-----------------------------------------------------------------------------
 // qGeoSlicerAppMainWindowPrivate methods
@@ -55,29 +64,65 @@ void qGeoSlicerAppMainWindowPrivate::init()
 void qGeoSlicerAppMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 {
   qSlicerApplication * app = qSlicerApplication::application();
-
   //----------------------------------------------------------------------------
   // Add actions
   //----------------------------------------------------------------------------
+  QAction* helpKeyboardShortcutsAction = new QAction(mainWindow);
+  helpKeyboardShortcutsAction->setObjectName("HelpKeyboardShortcutsAction");
+  helpKeyboardShortcutsAction->setText(qGeoSlicerAppMainWindow::tr("&Keyboard Shortcuts"));
+  helpKeyboardShortcutsAction->setToolTip(qGeoSlicerAppMainWindow::tr("Raise a window that lists commonly-used keyboard shortcuts."));
+
+  QAction* helpInterfaceDocumentationAction = new QAction(mainWindow);
+  helpInterfaceDocumentationAction->setObjectName("HelpInterfaceDocumentationAction");
+  helpInterfaceDocumentationAction->setText(qGeoSlicerAppMainWindow::tr("Interface Documentation"));
+  helpInterfaceDocumentationAction->setShortcut(QKeySequence(qGeoSlicerAppMainWindow::tr("Ctrl+1", "Interface Documentation")));
+
+  QAction* helpBrowseTutorialsAction = new QAction(mainWindow);
+  helpBrowseTutorialsAction->setObjectName("HelpBrowseTutorialsAction");
+  helpBrowseTutorialsAction->setText(qGeoSlicerAppMainWindow::tr("Browse tutorials"));
+  helpBrowseTutorialsAction->setToolTip(qGeoSlicerAppMainWindow::tr("Raise the training pages in your favorite web browser"));
+
+  QAction* helpReportBugOrFeatureRequestAction = new QAction(mainWindow);
+  helpReportBugOrFeatureRequestAction->setObjectName("HelpReportBugOrFeatureRequestAction");
+  helpReportBugOrFeatureRequestAction->setText(qGeoSlicerAppMainWindow::tr("Report a bug"));
+  helpReportBugOrFeatureRequestAction->setToolTip(qGeoSlicerAppMainWindow::tr("Report error or request enhancement or new feature."));
+
   QAction* helpAboutSlicerAppAction = new QAction(mainWindow);
   helpAboutSlicerAppAction->setObjectName("HelpAboutGeoSlicerAppAction");
   helpAboutSlicerAppAction->setText("About " + app->applicationName());
 
   //----------------------------------------------------------------------------
-  // Calling "setupUi()" after adding the actions above allows the call
-  // to "QMetaObject::connectSlotsByName()" done in "setupUi()" to
-  // successfully connect each slot with its corresponding action.
+// Calling "setupUi()" after adding the actions above allows the call
+// to "QMetaObject::connectSlotsByName()" done in "setupUi()" to
+// successfully connect each slot with its corresponding action.
   this->Superclass::setupUi(mainWindow);
-  
-  // Add Help Menu Action
-  this->HelpMenu->addAction(helpAboutSlicerAppAction);
 
   //----------------------------------------------------------------------------
   // Configure
   //----------------------------------------------------------------------------
   mainWindow->setWindowIcon(QIcon(":/Icons/Medium/DesktopIcon.png"));
 
-  QPixmap logo(":/LogoFull.png");
+  this->HelpMenu->addAction(helpKeyboardShortcutsAction);
+  this->HelpMenu->addAction(helpInterfaceDocumentationAction);
+  this->HelpMenu->addAction(helpBrowseTutorialsAction);
+  this->HelpMenu->addSeparator();
+  this->HelpMenu->addAction(helpReportBugOrFeatureRequestAction);
+  this->HelpMenu->addAction(helpAboutSlicerAppAction);
+
+  //----------------------------------------------------------------------------
+  // Icons in the menu
+  //----------------------------------------------------------------------------
+
+  QIcon networkIcon = mainWindow->style()->standardIcon(QStyle::SP_DriveNetIcon);
+  QIcon informationIcon = mainWindow->style()->standardIcon(QStyle::SP_MessageBoxInformation);
+  QIcon questionIcon = mainWindow->style()->standardIcon(QStyle::SP_MessageBoxQuestion);
+
+  helpBrowseTutorialsAction->setIcon(networkIcon);
+  helpInterfaceDocumentationAction->setIcon(networkIcon);
+  helpAboutSlicerAppAction->setIcon(informationIcon);
+  helpReportBugOrFeatureRequestAction->setIcon(questionIcon);
+
+
   this->LogoLabel->setVisible(false);
 
   // Hide the toolbars
@@ -134,5 +179,74 @@ void qGeoSlicerAppMainWindow::on_HelpAboutGeoSlicerAppAction_triggered()
 {
   qSlicerAboutDialog about(this);
   about.setLogo(QPixmap(":/Logo.png"));
+  about.setWindowIcon(QIcon(":/Icons/Medium/DesktopIcon.png"));
   about.exec();
+}
+
+void qGeoSlicerAppMainWindow::on_HelpKeyboardShortcutsAction_triggered()
+{
+  qSlicerActionsDialog actionsDialog(this);
+  actionsDialog.setActionsWithNoShortcutVisible(false);
+  actionsDialog.setMenuActionsVisible(false);
+  actionsDialog.addActions(this->findChildren<QAction*>(), "Slicer Application");
+  actionsDialog.setWindowIcon(QIcon(":/Icons/Medium/DesktopIcon.png"));
+
+  // scan the modules for their actions
+  QList<QAction*> moduleActions;
+  qSlicerModuleManager * moduleManager = qSlicerApplication::application()->moduleManager();
+  foreach(const QString& moduleName, moduleManager->modulesNames())
+    {
+    qSlicerAbstractModule* module =
+      qobject_cast<qSlicerAbstractModule*>(moduleManager->module(moduleName));
+    if (module)
+      {
+      moduleActions << module->action();
+      }
+    }
+  if (moduleActions.size())
+    {
+    actionsDialog.addActions(moduleActions, "Modules");
+    }
+  // TODO add more actions
+  actionsDialog.exec();
+}
+
+//---------------------------------------------------------------------------
+void qGeoSlicerAppMainWindow::on_HelpBrowseTutorialsAction_triggered()
+{
+  QString url;
+  if (qSlicerApplication::application()->releaseType() == "Stable")
+    {
+    url = QString("http://www.slicer.org/slicerWiki/index.php/Documentation/%1.%2/Training")
+                    .arg(Slicer_VERSION_MAJOR).arg(Slicer_VERSION_MINOR);
+    }
+  else
+    {
+    url = QString("http://www.slicer.org/slicerWiki/index.php/Documentation/Nightly/Training");
+    }
+  QDesktopServices::openUrl(QUrl(url));
+}
+
+//---------------------------------------------------------------------------
+void qGeoSlicerAppMainWindow::on_HelpInterfaceDocumentationAction_triggered()
+{
+  QString url;
+  if (qSlicerApplication::application()->releaseType() == "Stable")
+    {
+    url = QString("http://www.slicer.org/slicerWiki/index.php/Documentation/%1.%2")
+                    .arg(Slicer_VERSION_MAJOR).arg(Slicer_VERSION_MINOR);
+    }
+  else
+    {
+    url = QString("http://www.slicer.org/slicerWiki/index.php/Documentation/Nightly");
+    }
+  QDesktopServices::openUrl(QUrl(url));
+}
+
+//---------------------------------------------------------------------------
+void qGeoSlicerAppMainWindow::on_HelpReportBugOrFeatureRequestAction_triggered()
+{
+  qSlicerErrorReportDialog errorReport(this);
+  errorReport.setWindowIcon(QIcon(":/Icons/Medium/DesktopIcon.png"));
+  errorReport.exec();
 }
