@@ -35,7 +35,16 @@ Slicer sources will be checked out automatically according to the git repo and t
 5. Generate the project.
 6. Open `C:\GeoSlicerBuild\GeoSlicer.sln`, select `Release` and build the project.
 
-Note: if xeus and xeus-python does not build. add the respective includes to the CMakeLists
+CMake has a problem with findopenssl.
+add 
+
+	set(OPENSSL_INCLUDE_DIR "C:/GeoSlicerBuild/OpenSSL-install/Release/include" )
+
+to line 585 of
+C:\Program Files\CMake\share\cmake-3.21\Modules\FindOpenSSL.cmake
+
+
+If xeus and xeus-python does not build add the respective includes to the CMakeLists
 
 xeus:
 
@@ -43,11 +52,38 @@ xeus:
 
 xeus-python:
 
-	include_directories("../OpenSSL-install/Release/include")
 	include_directories("../pybind11/include")
 	include_directories("../pybind11_json/include")
+	include_directories("../xeus/include")
+	include_directories("../nlohmann_json/include")
+	include_directories("../ZeroMQ/include")
+	include_directories("../cppzmq")
 
-Build them individually using the .sln file of xeus-build and xeus-python-build. 
+Build them individually.
+
+Build order is wrong, sometimes the projects do not compile, so compile in this order:
+	
+	python
+	pybind11
+	pybind11_json
+	xeus
+	xeus-python
+	VTK
+	ITK
+	SimpleITK
+	ALL-build
+	
+If still having trouble with the build order, try to build the individual project and see what dependency is not building before it.
+
+error LNK1181: cannot open input file 'optimized.lib' 
+https://github.com/Slicer/Slicer/issues/4898
+
+TL;DR;
+Cmake is finding a debug python build outside the slicer build folder.
+temporarily move away C:/Python36-x64/libs folder to somewhere to make sure it cannot be found during the build
+check SimpleITK-build/CmakeCache.txt and VTK-build/CmakeCache.txt for empty or not found PYTHON_DEBUG_LIBRARY:FILEPATH
+	
+	
 
 Package
 -------
