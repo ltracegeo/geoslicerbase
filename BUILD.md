@@ -14,7 +14,7 @@ Prerequisites
 
 * [CMake](http://cmake.org/cmake/resources/software.html), version 3.12 or above
 
-* Qt, version 5.51.1
+* Qt, version 5.15.2
 
 * [Git](http://git-scm.com/downloads)
 
