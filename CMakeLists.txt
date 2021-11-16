@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.13.4)
 
+if(NOT DEFINED Qt5_DIR)
+  set(Qt5_DIR "C:/Qt515/5.15.2/msvc2019_64/lib/cmake/Qt5")
+endif()
+
 # Enable C++11
 if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
@@ -13,7 +17,7 @@ if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
     GIT_REPOSITORY git@bitbucket.org:ltrace/slicer.git
-    GIT_TAG 64911484b8fc757fed921927f365a0e1074755bd
+    GIT_TAG 0d1bff479399cb4ababc646cc77404f80310d499
     GIT_PROGRESS   1
     )
 else()
@@ -134,7 +138,7 @@ set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
 FetchContent_Populate(${extension_name}
  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
  GIT_REPOSITORY https://github.com/fbordignon/SlicerJupyter.git
- GIT_TAG        35f0163c7e89533564fa52c34f2b1ad70a950286
+ GIT_TAG        c8a815bea1091c5783a2fb69abc0d90aa402ea53
  GIT_PROGRESS   1
  QUIET
  )
@@ -145,8 +149,8 @@ set(extension_name "SegmentMesher")
 set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
 FetchContent_Populate(${extension_name}
  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
- GIT_REPOSITORY https://github.com/lassoan/SlicerSegmentMesher.git
- GIT_TAG        ea925a67fdd93d70082d5f94a27ae98892b5d728
+ GIT_REPOSITORY https://github.com/fbordignon/SlicerSegmentMesher.git
+ GIT_TAG        caa009dd6e4f3a505adce95beadda8fe817485a9
  GIT_PROGRESS   1
  QUIET
  )
