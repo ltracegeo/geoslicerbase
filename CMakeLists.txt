@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.13.4)
 
+set(ADDITIONAL_CXX_FLAGS /MP)
+set(ADDITIONAL_C_FLAGS /MP)
+set(CMAKE_CONFIGURATION_TYPES Release)
+
+if(NOT DEFINED Qt5_DIR)
+  set(Qt5_DIR "C:/Qt515/5.15.2/msvc2019_64/lib/cmake/Qt5")
+endif()
+
 # Enable C++11
 if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
