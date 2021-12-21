@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.13.4)
 
+set(ADDITIONAL_CXX_FLAGS /MP)
+set(ADDITIONAL_C_FLAGS /MP)
+set(CMAKE_CONFIGURATION_TYPES Release)
+
 if(NOT DEFINED Qt5_DIR)
-  set(Qt5_DIR "C:/Qt515/5.15.2/msvc2019_64/lib/cmake/Qt5")
+  set(Qt5_DIR "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5")
 endif()
 
 # Enable C++11
@@ -17,7 +21,7 @@ if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
     GIT_REPOSITORY git@bitbucket.org:ltrace/slicer.git
-    GIT_TAG a00aba073c70746f42e11fcbfeccfce56eef9442
+    GIT_TAG d7a754685887b05cc848c05264f47cb2a43f63db
     GIT_PROGRESS   1
     )
 else()
