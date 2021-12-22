@@ -142,7 +142,7 @@ set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
 FetchContent_Populate(${extension_name}
  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
  GIT_REPOSITORY https://github.com/fbordignon/SlicerJupyter.git
- GIT_TAG        c8a815bea1091c5783a2fb69abc0d90aa402ea53
+ GIT_TAG        087cb22b64b4171618cc175ace5099771baef3f3
  GIT_PROGRESS   1
  QUIET
  )
