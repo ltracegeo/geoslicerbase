@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.13.4)
 set(ADDITIONAL_CXX_FLAGS /MP)
 set(ADDITIONAL_C_FLAGS /MP)
 set(CMAKE_CONFIGURATION_TYPES Release)
+set(Slicer_USE_GIT_PROTOCOL OFF)
 
 if(NOT DEFINED Qt5_DIR)
   set(Qt5_DIR "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5")
@@ -21,7 +22,7 @@ if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
     GIT_REPOSITORY git@bitbucket.org:ltrace/slicer.git
-    GIT_TAG 2d99151667b0d3b479e4e8eab8b5c9a74ffbae49
+    GIT_TAG 68a73294350132ccd27385b596dab734014912af
     GIT_PROGRESS   1
     )
 else()
@@ -154,7 +155,7 @@ set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
 FetchContent_Populate(${extension_name}
  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
  GIT_REPOSITORY https://github.com/fbordignon/SlicerSegmentMesher.git
- GIT_TAG        caa009dd6e4f3a505adce95beadda8fe817485a9
+ GIT_TAG        5f2001ea61b66c3552891e5854391e405168d67b
  GIT_PROGRESS   1
  QUIET
  )
