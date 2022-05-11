@@ -2,11 +2,14 @@ cmake_minimum_required(VERSION 3.13.4)
 
 set(ADDITIONAL_CXX_FLAGS /MP)
 set(ADDITIONAL_C_FLAGS /MP)
-set(CMAKE_CONFIGURATION_TYPES Release)
 set(Slicer_USE_GIT_PROTOCOL OFF)
 
-if(NOT DEFINED Qt5_DIR)
-  set(Qt5_DIR "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5")
+if (WIN32)
+  set(CMAKE_CONFIGURATION_TYPES Release)
+
+  if(NOT DEFINED Qt5_DIR)
+    set(Qt5_DIR "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5")
+  endif()
 endif()
 
 # Enable C++11
