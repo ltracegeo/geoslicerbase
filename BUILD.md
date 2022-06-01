@@ -52,11 +52,27 @@ Cmake is finding a debug python build outside the slicer build folder.
 temporarily move away C:/Python36-x64/libs folder to somewhere to make sure it cannot be found during the build
 check SimpleITK-build/CmakeCache.txt and VTK-build/CmakeCache.txt for empty or not found PYTHON_DEBUG_LIBRARY:FILEPATH
 	
+**Selecting a local repository for Slicer**
+
+If you can't clone a repository with git through CMake, you can manually change the line
+```
+GIT_REPOSITORY git@bitbucket.org:ltrace/slicer.git
+```
+in CMakeLists.txt to include de local Slicer repo path, such as:
+```
+GIT_REPOSITORY D:/Geoslicer/slicer
+```
+	
+**Building with debug**
+
+Select RelWithDebInfo on Solution Configuration (drop-down menu on top bar on Visual Studio)
+It is currently necessary to either build with Release before building with RelWithDebInfo, or manually changing 
+the files ```Slicer-build\cmake_install.cmake``` and ```Slicer-build\CMake\LastConfigureStep\cmake_install.cmake```
 
 Package
 -------
 
-Install [NSIS 2](http://sourceforge.net/projects/nsis/files/)
+Install [NSIS 3](http://sourceforge.net/projects/nsis/files/)
 
 **CMake and Visual Studio**
 
