@@ -5,7 +5,7 @@ set(ADDITIONAL_C_FLAGS /MP)
 set(Slicer_USE_GIT_PROTOCOL OFF)
 
 if (WIN32)
-  set(CMAKE_CONFIGURATION_TYPES Release)
+  set(CMAKE_CONFIGURATION_TYPES "Release;RelWithDebInfo")
 
   if(NOT DEFINED Qt5_DIR)
     set(Qt5_DIR "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5")
