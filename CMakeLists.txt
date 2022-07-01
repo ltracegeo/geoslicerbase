@@ -12,9 +12,9 @@ if (WIN32)
   endif()
 endif()
 
-# Enable C++11
+# Enable C++14
 if(NOT DEFINED CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 11)
+  set(CMAKE_CXX_STANDARD 14)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -25,7 +25,7 @@ if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
     GIT_REPOSITORY git@bitbucket.org:ltrace/slicer.git
-    GIT_TAG 93f8acd523524298ada0155ec1a52994cd4ef0be
+    GIT_TAG 9a40eeda3eb860ceefd7d293c6c30b7c2612d856
     GIT_PROGRESS   1
     )
 else()
@@ -146,7 +146,7 @@ set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
 FetchContent_Populate(${extension_name}
  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
  GIT_REPOSITORY https://github.com/fbordignon/SlicerJupyter.git
- GIT_TAG        087cb22b64b4171618cc175ace5099771baef3f3
+ GIT_TAG        b586f3b85e5b0e31a9ad3e17ef13419cecd64b16
  GIT_PROGRESS   1
  QUIET
  )
@@ -157,8 +157,8 @@ set(extension_name "SegmentMesher")
 set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
 FetchContent_Populate(${extension_name}
  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
- GIT_REPOSITORY https://github.com/fbordignon/SlicerSegmentMesher.git
- GIT_TAG        5f2001ea61b66c3552891e5854391e405168d67b
+ GIT_REPOSITORY https://github.com/lassoan/SlicerSegmentMesher.git
+ GIT_TAG        d02040859b2ec667ada3c1c3455ff48380f0ac78
  GIT_PROGRESS   1
  QUIET
  )
@@ -170,7 +170,7 @@ set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
 FetchContent_Populate(${extension_name}
  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
  GIT_REPOSITORY https://github.com/lassoan/SlicerSegmentEditorExtraEffects.git
- GIT_TAG        16da8d87c6b7a329f3570bcc4750e8719052213f
+ GIT_TAG        719b242faf301c899fb8ec7a448440ae54ca762c
  GIT_PROGRESS   1
  QUIET
  )
@@ -194,7 +194,7 @@ set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
 FetchContent_Populate(${extension_name}
  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
  GIT_REPOSITORY https://github.com/SlicerIGT/SlicerMarkupsToModel.git
- GIT_TAG        21e43a8978d5634b8702e8ee798f94957aa7d6f0
+ GIT_TAG        835453f30c0da005853d5175aa8980928da5cd49
  GIT_PROGRESS   1
  QUIET
  )

@@ -25,6 +25,7 @@
 #include <QPixmap>
 #include <QStyle>
 #include <QUrl>
+#include <QLabel>
 
 // Slicer includes
 #include "qSlicerApplication.h"
@@ -122,8 +123,10 @@ void qGeoSlicerAppMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   helpAboutSlicerAppAction->setIcon(informationIcon);
   helpReportBugOrFeatureRequestAction->setIcon(questionIcon);
 
-
-  this->LogoLabel->setVisible(false);
+  QLabel *logoLabel = mainWindow->findChild<QLabel *>("LogoLabel");
+  if (logoLabel != nullptr) {
+    logoLabel->setVisible(false);
+  }
 
   // Hide the toolbars
   // this->MainToolBar->setVisible(false);
