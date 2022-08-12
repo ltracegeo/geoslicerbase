@@ -25,7 +25,7 @@ if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
     GIT_REPOSITORY git@bitbucket.org:ltrace/slicer.git
-    GIT_TAG 211a16d7ceed88236a33f425f0af90a5a03a0ab3
+    GIT_TAG f621c429c930aa3f59425560e4b2fddea44178b5
     GIT_PROGRESS   1
     )
 else()
@@ -200,6 +200,17 @@ FetchContent_Populate(${extension_name}
  )
 list(APPEND Slicer_EXTENSION_SOURCE_DIRS ${${extension_name}_SOURCE_DIR})
 
+# MarkupsToModel
+set(extension_name "DebuggingTools")
+set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
+FetchContent_Populate(${extension_name}
+ SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
+ GIT_REPOSITORY https://github.com/SlicerRt/SlicerDebuggingTools.git
+ GIT_TAG        e104b8d0d68f9623d9b878b98ba63976d5695e02
+ GIT_PROGRESS   1
+ QUIET
+ )
+list(APPEND Slicer_EXTENSION_SOURCE_DIRS ${${extension_name}_SOURCE_DIR})
 
 # Add Slicer sources
 add_subdirectory(${slicersources_SOURCE_DIR} ${slicersources_BINARY_DIR})
