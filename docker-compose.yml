@@ -1,0 +1,16 @@
+version: "3"
+services:
+  slicerltrace-windows:
+    image: slicerltrace-windowsservercore:latest
+    build:
+      context: .
+      dockerfile: tools/docker/windows.Dockerfile
+      target: image-prod
+  slicerltrace-windows-dev:
+    image: slicerltrace-windowsservercore-dev:latest
+    build:
+      context: .
+      dockerfile: tools/docker/windows.Dockerfile
+      target: image-dev
+    volumes:
+      - .:c:/geoslicerbase
