@@ -200,7 +200,7 @@ FetchContent_Populate(${extension_name}
  )
 list(APPEND Slicer_EXTENSION_SOURCE_DIRS ${${extension_name}_SOURCE_DIR})
 
-# MarkupsToModel
+# DebuggingTools
 set(extension_name "DebuggingTools")
 set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
 FetchContent_Populate(${extension_name}
