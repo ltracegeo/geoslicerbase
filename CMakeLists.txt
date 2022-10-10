@@ -14,7 +14,7 @@ endif()
 
 # Enable C++14
 if(NOT DEFINED CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -25,7 +25,7 @@ if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
     GIT_REPOSITORY git@bitbucket.org:ltrace/slicer.git
-    GIT_TAG 7fcd0376770a64304f83a49c710c86a3895ea704
+    GIT_TAG dd32ab8ba5bb385094e0a36dc9b7f0ad459f2282
     GIT_PROGRESS   1
     )
 else()
@@ -112,6 +112,7 @@ option(Slicer_BUILD_CompareVolumes              "Build application with ChangeTr
 option(Slicer_BUILD_LandmarkRegistration        "Build application with LandmarkRegistration module"  ON)
 option(Slicer_BUILD_SurfaceToolbox              "Build application with SurfaceToolbox module"        ON)
 option(Slicer_BUILD_WEBENGINE_SUPPORT           "Build application with webengine support"            ON)
+option(Slicer_STORE_SETTINGS_IN_APPLICATION_HOME_DIR "Store all settings in the application home directory (makes the application portable)" OFF)
 
 # Enable Slicer built-in modules
 # set(Slicer_CLIMODULES_ENABLED
@@ -158,7 +159,7 @@ set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
 FetchContent_Populate(${extension_name}
  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
  GIT_REPOSITORY https://github.com/lassoan/SlicerSegmentMesher.git
- GIT_TAG        d02040859b2ec667ada3c1c3455ff48380f0ac78
+ GIT_TAG        01b2a16ca79b676488f98179e0e5a381b972ec2d
  GIT_PROGRESS   1
  QUIET
  )
