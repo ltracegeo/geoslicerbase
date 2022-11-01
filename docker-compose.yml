@@ -1,16 +1,44 @@
 version: "3"
 services:
-  slicerltrace-windows:
-    image: slicerltrace-windowsservercore:latest
+  geoslicerbase-windows:
+    image: geoslicerbase-windows:latest
     build:
       context: .
       dockerfile: tools/docker/windows.Dockerfile
       target: image-prod
-  slicerltrace-windows-dev:
-    image: slicerltrace-windowsservercore-dev:latest
+    volumes:
+      - ~/.ssh:c:/Users/ContainerAdministrator/.ssh
+    storage_opt:
+      size: '30G'
+  geoslicerbase-windows-dev:
+    image: geoslicerbase-windows-dev:latest
     build:
       context: .
       dockerfile: tools/docker/windows.Dockerfile
       target: image-dev
     volumes:
-      - .:c:/geoslicerbase
+      - .:c:/geoslicerbase/
+      - ~/.ssh:c:/Users/ContainerAdministrator/.ssh
+    storage_opt:
+      size: '30G'
+  geoslicerbase-ubuntu:
+    image: geoslicerbase-ubuntu:latest
+    build:
+      context: .
+      dockerfile: tools/docker/ubuntu.Dockerfile
+      target: image-prod
+    volumes:
+      - ~/.ssh:c:/Users/ContainerAdministrator/.ssh
+    storage_opt:
+      size: '30G'
+  geoslicerbase-ubuntu-dev:
+    image: geoslicerbase-ubuntu-dev:latest
+    build:
+      context: .
+      dockerfile: tools/docker/ubuntu.Dockerfile
+      target: image-dev
+    volumes:
+      - .:/geoslicerbase
+      - ~/.ssh:/root/.ssh
+    storage_opt:
+      size: '30G'

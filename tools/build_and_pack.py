@@ -18,23 +18,65 @@ logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.INFO)
 
 
+
+def get_working_dir():
+    if args.avoid_long_path and sys.platform == "win32":
+        path = Path(Path.home().drive + "/gsb")
+    else:
+        path = Path.home() / "gsb"
+
+    return path
+
+
+def generate_project_command(args):
+    output_directory_path = get_working_dir()
+    if sys.platform == "win32":
+        command = f"cmake -S {args.source.as_posix()} -B {output_directory_path.as_posix()} -DCMAKE_BUILD_TYPE:STRING={args.type} -DSlicer_SKIP_ROOT_DIR_MAX_LENGTH_CHECK:BOOL=TRUE"
+    else:
+        command = f"cmake -S {args.source.as_posix()} -B {output_directory_path.as_posix()} -DCMAKE_BUILD_TYPE:STRING={args.type}"
+    print(f"generate_project_command {command}")
+    return command
+
+
+def build_command(args):
+    if sys.platform == "win32":
+        command = f"msbuild GeoSlicer.sln /p:Configuration={args.type} /m:{args.jobs}"
+    else:
+        command = f"make -j{args.jobs}"
+    print(f"build_command {command}")
+
+    return command
+
+
+def generate_package_command(args):
+    if sys.platform == "win32":
+        command = f"msbuild PACKAGE.vcxproj /p:Configuration={args.type} /m:{args.jobs}"
+    else:
+        command = f"make package"
+    print(f"generate_package_command {command}")
+
+    return command
+
+
 def process(args):
-    output_directory_path = Path.home() / "gsbuild"
-    if output_directory_path.exists():
+    output_directory_path = get_working_dir()
+    if args.no_cache and output_directory_path.exists():
         logger.info("Deleting old build directory remainings")
         shutil.rmtree(output_directory_path, onerror=onerror)
 
     output_directory_path.mkdir(exist_ok=True)
 
+    subprocess_as_shell = sys.platform == "win32"
+
     # Run cmake to generate buildable project
     logger.info("Generating buildable project...")
-    command_as_list = f"cmake -S {args.source} -B {output_directory_path.as_posix()}".split()
-    run_subprocess(command_as_list)
+    command_as_list = generate_project_command(args).split()
+    run_subprocess(command_as_list, shell=subprocess_as_shell)
 
     # Build project
     logger.info("Building project...")
-    command_as_list = f"cd {output_directory_path.as_posix()} & msbuild GeoSlicer.sln /p:Configuration={args.type} /m:{args.jobs}".split()
-    run_subprocess(command_as_list)
+    command_as_list = build_command(args).split()
+    run_subprocess(command_as_list, shell=subprocess_as_shell, cwd=output_directory_path.as_posix())
 
     # Pack the application
     logger.info("Packaging application...")
@@ -42,8 +84,8 @@ def process(args):
     if not slicer_build_file_path.exists():
         raise RuntimeError("Slicer-build folder not found in the project directory.")
 
-    command_as_list = f"cd {slicer_build_file_path.as_posix()} & msbuild PACKAGE.vcxproj /p:Configuration={args.type} /m:{args.jobs}".split()
-    run_subprocess(command_as_list)
+    command_as_list = generate_package_command(args).split()
+    run_subprocess(command_as_list, shell=subprocess_as_shell, cwd=slicer_build_file_path.as_posix())
 
     # Export
     if args.no_export:
@@ -104,31 +146,35 @@ def export_application(slicer_build_file_path: Path):
     # Compress application folder
     logger.info("Compressing GeoSlicer base application directory...")
     geoslicer_base_compressed_file_path = geoslicer_base_directory_path.parent / (
-        geoslicer_base_directory_path.name + "teste"
+        geoslicer_base_directory_path.name
     )
-    shutil.make_archive(geoslicer_base_compressed_file_path, "zip", geoslicer_base_directory_path)
+    archive_format = "zip" if sys.platform == "win32" else "gztar"
+    shutil.make_archive(geoslicer_base_compressed_file_path, archive_format, geoslicer_base_directory_path)
+
+    archive_extension = "zip" if sys.platform == "win32" else "tar.gz"
     geoslicer_base_compressed_file_path = geoslicer_base_directory_path.parent / (
-        geoslicer_base_directory_path.name + "teste.zip"
+        geoslicer_base_directory_path.name + f"{archive_extension}"
     )
     logger.debug(
         f"GeoSlicer base application compressed successfully! File path: {geoslicer_base_compressed_file_path.as_posix()}..."
     )
 
     # Export
-    bucket_output_directory = "GeoSlicer/base"
+    bucket_output_directory = f"GeoSlicer/base/{sys.platform}"
     bucket_name = "General_ltrace_files"
     namespace = "grrjnyzvhu1t"
     upload_file_2_bucket(geoslicer_base_compressed_file_path, bucket_output_directory, namespace, bucket_name)
 
 
-def run_subprocess(command, assert_exit_code=True, shell=True):
+def run_subprocess(command, assert_exit_code=True, shell=True, cwd=None):
     """Wrapper for running subprocess and reading its output"""
-    with subprocess.Popen(command, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True, shell=shell) as proc:
+    with subprocess.Popen(command, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True, shell=shell, cwd=cwd) as proc:
         for line in proc.stdout:
             print(f"\t{line}", end="")
 
     if assert_exit_code and proc.returncode != 0:
         raise subprocess.CalledProcessError(proc.returncode, proc.args)
+
 
 def onerror(func, path, exc_info):
     """
@@ -150,17 +196,22 @@ def onerror(func, path, exc_info):
     else:
         raise
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Apply dynamic changes to CMakeLists.txt")
     parser.add_argument("--source", help="The source code directory path.", default=None)
     parser.add_argument("--jobs", help="The jobs quantity for parallel building.", default=1)
     parser.add_argument("--type", help="The build type. Default to Release", default="Release")
     parser.add_argument("--no-export", action="store_true", help="Skip application exporting step", default=False)
+    parser.add_argument("--no-cache", action="store_true", help="Delete old build files before starting process", default=False)
+    parser.add_argument("--avoid-long-path", action="store_true", help="Avoid long path issues", default=False)
 
     args = parser.parse_args()
 
     if args.source is None:
         raise AttributeError("The source code directory path is missing! Aborting process...")
+
+    args.source = Path(args.source).absolute()
 
     try:
         logger.info(f"Starting build & package process...")

@@ -5,11 +5,11 @@ SHELL ["cmd", "/S", "/C"]
 
 # Install Visual Studio C++ & Build tools
 RUN curl -SL --output vs_buildtools.exe https://aka.ms/vs/17/release/vs_buildtools.exe && \
-    start /w vs_buildtools.exe --quiet --wait --norestart --includeRecommended --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\BuildTools" --add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.CoreBuildTools --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest --add Microsoft.VisualStudio.Component.VC.v141.x86.x64 && \
+    start /w vs_buildtools.exe --quiet --wait --norestart --includeRecommended --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\BuildTools" --add Microsoft.Component.MSBuild --add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.CoreBuildTools --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest --add Microsoft.VisualStudio.Component.VC.v141.x86.x64 && \
     del /q vs_buildtools.exe
 
 RUN curl -SL --output vs_community.exe https://aka.ms/vs/17/release/vs_community.exe && \
-    start /w vs_community.exe --quiet --wait --norestart --nocache --includeRecommended --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community" --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest --add Microsoft.VisualStudio.Component.VC.v141.x86.x64 && \
+    start /w vs_community.exe --quiet --wait --norestart --nocache --includeRecommended --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community" --add Microsoft.Component.MSBuild --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest --add Microsoft.VisualStudio.Component.VC.v141.x86.x64 && \
     del /q vs_community.exe
 
 # Change shell to powershell as default shell for the followings commands
@@ -37,6 +37,17 @@ RUN mkdir "$env:userprofile\\.oci"; \
 # Set your PowerShell execution policy
 RUN Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force
 
+# Install Qt
+RUN $exePath = "$env:TEMP + '\qt-unified-windows-x64-4.4.1-online.exe'" ; \ 
+    curl.exe -L 'https://download.qt.io/archive/online_installers/4.4/qt-unified-windows-x64-4.4.1-online.exe' --output "$exePath" ; \
+    cmd /C "$exePath" install qt.qt5.5152.qtwebengine qt.qt5.5152.qtscript qt.qt5.5152.win64_msvc2019_64 \ 
+        qt.qt5.5152.qtwebglplugin.win64_msvc2019_64 qt.qt5.5152.qtwebengine.win64_msvc2019_64 qt.qt5.5152.qtvirtualkeyboard.win64_msvc2019_64 \
+        qt.qt5.5152.qtscript.win64_msvc2019_64 qt.qt5.5152.qtquicktimeline.win64_msvc2019_64 qt.qt5.5152.qtquick3d.win64_msvc2019_64 \
+        qt.qt5.5152.qtpurchasing.win64_msvc2019_64 qt.qt5.5152.qtnetworkauth.win64_msvc2019_64 qt.qt5.5152.qtlottie.win64_msvc2019_64 \
+        qt.qt5.5152.qtdatavis3d.win64_msvc2019_64 qt.qt5.5152.qtcharts.win64_msvc2019_64 qt.qt5.5152.debug_info.win64_msvc2019_64 \
+        --root C:\Qt --auto-answer telemetry-question=No,AssociateCommonFiletypes=Yes --accept-licenses --accept-obligations \ 
+        --email giknakotru@vusra.com --pw LTRACEltrace123 --confirm-command --accept-messages --filter-packages "DisplayName=Qt 5.15.2"
+
 # Install Chocolatey
 ENV ChocolateyUseWindowsCompression false
 RUN iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) 
@@ -44,6 +55,8 @@ RUN iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.or
 # Install packages from Chocolatey
 RUN choco install git.install -y 
 RUN choco install 7zip.install -y
+RUN choco install cmake --version=3.22.1 -y
+RUN choco install nsis --version=3.07 -y
 
 # Enable long path
 RUN New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
@@ -59,12 +72,19 @@ RUN curl.exe -L 'https://objectstorage.sa-saopaulo-1.oraclecloud.com/p/jIBqg1698
 RUN [Environment]::SetEnvironmentVariable('PATH', "$env:PATH + ';' + $env:programfiles + '\Git\usr\bin\'", [System.EnvironmentVariableTarget]::Machine)
 
 # Add msbuild to path
-RUN [Environment]::SetEnvironmentVariable('PATH', "${env:programfiles(x86)} + '\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin'", [System.EnvironmentVariableTarget]::Machine)
+RUN [Environment]::SetEnvironmentVariable('PATH', "$env:PATH + ';' + ${env:programfiles(x86)} + '\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin'", [System.EnvironmentVariableTarget]::Machine)
 
-WORKDIR /geoslicerbase
+# Add cmake to path
+RUN [Environment]::SetEnvironmentVariable('PATH', "$env:PATH + ';' + $env:programfiles + '\CMake\bin'", [System.EnvironmentVariableTarget]::Machine)
+
+# Add environment variables related to Slicer build
+RUN [Environment]::SetEnvironmentVariable('GIT_EXECUTABLE', "$env:programfiles + '\Git\bin\git.exe'", [System.EnvironmentVariableTarget]::Machine)
+RUN [Environment]::SetEnvironmentVariable('Patch_EXECUTABLE', "$env:programfiles + '\Git\usr\bin\patch.exe'", [System.EnvironmentVariableTarget]::Machine) 
 
 # Update pip
 RUN python -m pip install --upgrade pip==22.0.2
+
+WORKDIR /geoslicerbase
 
 # Install tools dependencies
 COPY ./tools/requirements.txt ./tools/requirements.txt
@@ -73,19 +93,36 @@ RUN python -m pip install -r ./tools/requirements.txt
 # Config git
 RUN git config --global --add safe.directory C:/geoslicerbase
 
+ARG SLICER_GIT_COMMIT
+ENV SLICER_GIT_COMMIT $SLICER_GIT_COMMIT
+
+ARG THREADS
+ENV THREADS $THREADS
+
+ARG BUILD_TYPE
+ENV BUILD_TYPE $BUILD_TYPE
+
+ENV PYTHONUNBUFFERED 1
+ENV PIP_DEFAULT_TIMEOUT 100
+
 FROM base as image-dev
 # As development image: Mount repository to avoid copying and keep container running forever
+
+WORKDIR /
+
 CMD ["cmd", "/c", "ping", "-t", "localhost", ">", "NUL"]
 
 FROM base as image-prod
-# As production image: Copy all context and do the things
+# As production image: Copy all context and keep container running forever
 
 COPY . .
 
-# Update CMakeLists content
-RUN $ls_remote_result = git ls-remote git@bitbucket.org:ltrace/slicer.git master ; \
-    $slicer_repo_commit_tag = ($ls_remote_result -split '\\s+')[0] ; \
-    python ./tools/update_cmakelists_content.py --commit f621c429c930aa3f59425560e4b2fddea44178b5
+WORKDIR /
+
+RUN python ./geoslicerbase/tools/update_cmakelists_content.py --commit $ENV:SLICER_GIT_COMMIT
 
 # Build and pack application
-RUN python ./tools/build_and_pack.py --source . --jobs 42 --type Release --no-export
+RUN python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --type $ENV:BUILD_TYPE --jobs $ENV:THREADS
+
+
+CMD ["cmd", "/c", "ping", "-t", "localhost", ">", "NUL"]
