@@ -112,7 +112,7 @@ option(Slicer_BUILD_CompareVolumes              "Build application with ChangeTr
 option(Slicer_BUILD_LandmarkRegistration        "Build application with LandmarkRegistration module"  ON)
 option(Slicer_BUILD_SurfaceToolbox              "Build application with SurfaceToolbox module"        ON)
 option(Slicer_BUILD_WEBENGINE_SUPPORT           "Build application with webengine support"            ON)
-option(Slicer_STORE_SETTINGS_IN_APPLICATION_HOME_DIR "Store all settings in the application home directory (makes the application portable)" OFF)
+option(Slicer_STORE_SETTINGS_IN_APPLICATION_HOME_DIR "Store all settings in the application home directory (makes the application portable)" ON)
 
 # Enable Slicer built-in modules
 # set(Slicer_CLIMODULES_ENABLED
