@@ -219,7 +219,7 @@ set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
 FetchContent_Populate(${extension_name}
  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
  GIT_REPOSITORY https://github.com/fbordignon/MONAILabel.git
- GIT_TAG        1e83f8b0aaf1ecda17f275f2670eb841b5544e91
+ GIT_TAG        d393733e6071059134e0d6a27c3481a22690de0d
  GIT_PROGRESS   1
  QUIET
  )
