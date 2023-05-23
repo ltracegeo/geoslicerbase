@@ -153,7 +153,7 @@ def export_application(slicer_build_file_path: Path):
 
     archive_extension = "zip" if sys.platform == "win32" else "tar.gz"
     geoslicer_base_compressed_file_path = geoslicer_base_directory_path.parent / (
-        geoslicer_base_directory_path.name + f"{archive_extension}"
+        geoslicer_base_directory_path.name + f".{archive_extension}"
     )
     logger.debug(
         f"GeoSlicer base application compressed successfully! File path: {geoslicer_base_compressed_file_path.as_posix()}..."

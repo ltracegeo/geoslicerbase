@@ -29,7 +29,10 @@ pipeline {
                         }
                     }
                     stages {
-                        stage('Build [Windows]') {
+                        stage('Build Image [Windows]') {
+                            options {
+                                timeout(time: 120, unit: "MINUTES")
+                            }
                             steps {
                                 checkout scm  
                                 powershell '''
@@ -45,7 +48,10 @@ pipeline {
                                 }
                             }
                         }
-                        stage('Pack [Windows]') {
+                        stage('Build & Pack [Windows]') {
+                            options {
+                                timeout(time: 15, unit: "HOURS")
+                            }
                             steps {                        
                                 // Check git tag related to current branch
                                 script {
@@ -55,7 +61,7 @@ pipeline {
                                 powershell '''
                                     docker-compose up -d geoslicerbase-windows-dev --wait
                                     docker-compose exec -T geoslicerbase-windows-dev python ./geoslicerbase/tools/update_cmakelists_content.py --commit "${env:SLICER_GIT_COMMIT}"
-                                    docker-compose exec -T geoslicerbase-windows-dev python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --jobs "${env:THREADS}" --type "${env:BUILD_TYPE}"
+                                    docker-compose exec -T geoslicerbase-windows-dev python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --avoid-long-path --jobs "${env:THREADS}" --type "${env:BUILD_TYPE}"
                                 '''
                             }
                             post {
@@ -78,7 +84,10 @@ pipeline {
                         }
                     }
                     stages {
-                        stage('Build [Linux]') {
+                        stage('Build Image [Linux]') {
+                            options {
+                                timeout(time: 120, unit: "MINUTES")
+                            }
                             steps {
                                 checkout scm  
                                 sh '''
@@ -94,7 +103,10 @@ pipeline {
                                 }
                             }
                         }
-                        stage('Pack [Linux]') {
+                        stage('Build & Pack [Linux]') {
+                            options {
+                                timeout(time: 15, unit: "HOURS")
+                            }
                             steps {                        
                                 // Check git tag related to current branch
                                 script {
