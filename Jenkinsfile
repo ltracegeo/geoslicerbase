@@ -34,12 +34,13 @@ pipeline {
                                 timeout(time: 120, unit: "MINUTES")
                             }
                             steps {
+                                cleanWs()
                                 checkout scm  
+                                    // $oci_config = [IO.File]::ReadAllText("$env:USERPROFILE\\.oci\\config")
+                                    // $oci_api_key_public = [IO.File]::ReadAllText("$env:USERPROFILE\\.oci\\oci_api_key_public.pem")
+                                    // $oci_api_key = [IO.File]::ReadAllText("$env:USERPROFILE\\.oci\\oci_api_key.pem")
                                 powershell '''
-                                    $oci_config = [IO.File]::ReadAllText("$env:USERPROFILE\\.oci\\config")
-                                    $oci_api_key_public = [IO.File]::ReadAllText("$env:USERPROFILE\\.oci\\oci_api_key_public.pem")
-                                    $oci_api_key = [IO.File]::ReadAllText("$env:USERPROFILE\\.oci\\oci_api_key.pem")
-                                    docker-compose build --build-arg OCI_CONFIG="${oci_config}" --build-arg OCI_API_KEY_PUBLIC="${oci_api_key_public}" --build-arg OCI_API_KEY="${oci_api_key}" geoslicerbase-windows-dev
+                                    docker-compose build geoslicerbase-windows-dev
                                 '''
                             }
                             post {
@@ -67,8 +68,22 @@ pipeline {
                             post {
                                 always {
                                     powershell "docker-compose down --remove-orphans -v"
+                                    powershell "docker system prune --force --filter 'until=3h'"
+                                    powershell "docker volume prune --force"
+                                    archiveArtifacts artifacts: 'tools/docker/*.log', fingerprint: true, allowEmptyArchive: true
                                 }
                             }
+                        }
+                    }
+                    post {
+                        // Clean after build
+                        always {
+                            cleanWs(cleanWhenNotBuilt: false,
+                                    deleteDirs: true,
+                                    disableDeferredWipeout: true,
+                                    notFailBuild: true,
+                                    patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
+                                            [pattern: '.propsfile', type: 'EXCLUDE']])
                         }
                     }
                 }
@@ -89,13 +104,15 @@ pipeline {
                                 timeout(time: 120, unit: "MINUTES")
                             }
                             steps {
+                                cleanWs()
                                 checkout scm  
                                 sh '''
-                                    oci_config="$(cat ${HOME}/.oci/config)"
-                                    oci_api_key_public="$(cat ${HOME}/.oci/oci_api_key_public.pem)"
-                                    oci_api_key="$(cat ${HOME}/.oci/oci_api_key.pem)"
-                                    docker compose build --build-arg OCI_CONFIG="${oci_config}" --build-arg OCI_API_KEY_PUBLIC="${oci_api_key_public}" --build-arg OCI_API_KEY="${oci_api_key}" geoslicerbase-ubuntu-dev
-                                '''
+                                    docker-compose build geoslicerbase-linux
+                                   '''
+                                    // oci_config="$(cat ${HOME}/.oci/config)"
+                                    // oci_api_key_public="$(cat ${HOME}/.oci/oci_api_key_public.pem)"
+                                    // oci_api_key="$(cat ${HOME}/.oci/oci_api_key.pem)"
+                                    // docker-compose build geoslicerbase-linux
                             }
                             post {
                                 always {
@@ -113,16 +130,30 @@ pipeline {
                                     env.SLICER_GIT_COMMIT = sh(returnStdout: true, script: "echo \$(git ls-remote git@bitbucket.org:ltrace/slicer.git \${SLICER_BRANCH}) | awk '{print \$1}'").trim()
                                 }
                                 sh '''
-                                    docker compose up -d geoslicerbase-ubuntu-dev --wait
-                                    docker compose exec -T geoslicerbase-ubuntu-dev python ./geoslicerbase/tools/update_cmakelists_content.py --commit "${SLICER_GIT_COMMIT}"
-                                    docker compose exec -T geoslicerbase-ubuntu-dev python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --avoid-long-path --jobs "${THREADS}" --type "${BUILD_TYPE}"
+                                    docker-compose up -d geoslicerbase-linux --wait
+                                    docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/update_cmakelists_content.py --commit "${SLICER_GIT_COMMIT}"
+                                    docker-compose exec -T geoslicerbase-linux python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --avoid-long-path --jobs "${THREADS}" --type "${BUILD_TYPE}"
                                 '''
                             }
                             post {
                                 always {
-                                    sh "docker compose down --remove-orphans -v"
+                                    sh "docker-compose down --remove-orphans -v"
+                                    sh "docker system prune --force --filter 'until=3h'"
+                                    sh "docker volume prune --force"
+                                    archiveArtifacts artifacts: 'tools/docker/*.log', fingerprint: true, allowEmptyArchive: true
                                 }
                             }
+                        }
+                    }
+                    post {
+                        // Clean after build
+                        always {
+                            cleanWs(cleanWhenNotBuilt: false,
+                                    deleteDirs: true,
+                                    disableDeferredWipeout: true,
+                                    notFailBuild: true,
+                                    patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
+                                            [pattern: '.propsfile', type: 'EXCLUDE']])
                         }
                     }
                 }

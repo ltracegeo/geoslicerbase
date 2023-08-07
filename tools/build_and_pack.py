@@ -13,8 +13,10 @@ from pathlib import Path
 
 
 # Configure logger
+log_file_path = Path(__file__).parent / "build.log"
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
+logger.addHandler(logging.FileHandler(filename=log_file_path.as_posix()))
 logger.setLevel(logging.INFO)
 
 

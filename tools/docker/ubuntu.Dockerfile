@@ -1,23 +1,8 @@
 FROM nvidia/cuda:11.2.2-cudnn8-devel-ubuntu20.04 as base
 
-# Read arguments related to OCI credentials
-ARG OCI_CONFIG
-ARG OCI_API_KEY_PUBLIC
-ARG OCI_API_KEY
-
-ENV OCI_CONFIG $OCI_CONFIG
-ENV OCI_API_KEY_PUBLIC $OCI_API_KEY_PUBLIC
-ENV OCI_API_KEY $OCI_API_KEY
 ENV OCI_CONFIG_FILE $HOME/.oci/config
-
 ENV PYTHONUNBUFFERED 1
 ENV PIP_DEFAULT_TIMEOUT 100
-
-# Install OCI credentials
-RUN mkdir -p $HOME/.oci/ ; \
-    echo "${OCI_CONFIG}" > $HOME/.oci/config ; \
-    echo "${OCI_API_KEY_PUBLIC}" > $HOME/.oci/oci_api_key_public.pem ; \
-    echo "${OCI_API_KEY}" > $HOME/.oci/oci_api_key.pem
 
 # Define image time zone
 ENV TZ=UTC

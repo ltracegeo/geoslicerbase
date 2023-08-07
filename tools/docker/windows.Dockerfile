@@ -15,25 +15,6 @@ RUN curl -SL --output vs_community.exe https://aka.ms/vs/17/release/vs_community
 # Change shell to powershell as default shell for the followings commands
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'Continue'; $verbosePreference='Continue';"]
 
-# Read arguments related to OCI credentials
-ARG OCI_CONFIG
-ARG OCI_API_KEY_PUBLIC
-ARG OCI_API_KEY
-
-ENV OCI_CONFIG $OCI_CONFIG
-ENV OCI_API_KEY_PUBLIC $OCI_API_KEY_PUBLIC
-ENV OCI_API_KEY $OCI_API_KEY
-
-# Install OCI credentials
-RUN mkdir "$env:userprofile\\.oci"; \ 
-    $oci_folder = "$env:userprofile + '\' + '.oci'" ; \ 
-    $config_file_path = "$oci_folder + '\' + 'config'" ; \ 
-    $oci_api_key_public_file_path =  "$oci_folder + '\' + 'oci_api_key_public.pem'"; \ 
-    $oci_api_key_file_path =  "$oci_folder + '\' + 'oci_api_key.pem'"; \ 
-    [IO.File]::WriteAllLines($config_file_path, $ENV:OCI_CONFIG) ; \
-    [IO.File]::WriteAllLines($oci_api_key_public_file_path, $ENV:OCI_API_KEY_PUBLIC) ; \
-    [IO.File]::WriteAllLines($oci_api_key_file_path, $ENV:OCI_API_KEY)
-
 # Set your PowerShell execution policy
 RUN Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force
 
