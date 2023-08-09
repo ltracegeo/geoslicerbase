@@ -19,12 +19,32 @@ endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Get the current working directory
+get_filename_component(current_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+# Define a variable to store the result of the command
+set(git_remote_url "")
+
+# Execute the command and store the result in the variable
+execute_process(
+    COMMAND git remote get-url origin
+    WORKING_DIRECTORY ${current_dir}
+    OUTPUT_VARIABLE git_remote_url
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Remove the repository name from the URL
+string(REGEX REPLACE "/[^/]*$" "" git_remote_url "${git_remote_url}")
+
+# Print the result
+message(STATUS "Git remote URL: ${git_remote_url}")
+
 # Slicer sources
 include(FetchContent)
 if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
-    GIT_REPOSITORY git@bitbucket.org:ltrace/slicer.git
+    GIT_REPOSITORY "${git_remote_url}/slicer.git"
     GIT_TAG c0d68775ed5639fb34fe8d3876a48bfb197052bb
     GIT_PROGRESS 1
     )

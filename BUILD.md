@@ -56,7 +56,7 @@ check SimpleITK-build/CmakeCache.txt and VTK-build/CmakeCache.txt for empty or n
 
 If you can't clone a repository with git through CMake, you can manually change the line
 ```
-GIT_REPOSITORY git@bitbucket.org:ltrace/slicer.git
+GIT_REPOSITORY "${git_remote_url}/slicer.git"
 ```
 in CMakeLists.txt to include de local Slicer repo path, such as:
 ```
