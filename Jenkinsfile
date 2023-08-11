@@ -18,15 +18,16 @@ pipeline {
             failFast true
             parallel {
                 stage("Windows") {
-                    agent {
-                            label "windows"
-                    }
                     options { skipDefaultCheckout() }
-                    when { 
+                    when {
+                        beforeAgent true;
                         anyOf {
                                 expression { return "${params.PLATFORM}" == "Windows"; } 
                                 expression { return "${params.PLATFORM}" == "Both"; } 
                         }
+                    }
+                    agent {
+                            label "windows"
                     }
                     stages {
                         stage('Build Image [Windows]') {
@@ -55,13 +56,13 @@ pipeline {
                             }
                             steps {                        
                                 // Check git tag related to current branch
-                                script {
-                                    env.GIT_LS_REMOTE_RESULT = powershell(returnStdout: true, script: 'git ls-remote git@bitbucket.org:ltrace/slicer.git ${env:SLICER_BRANCH}').trim()                            
-                                    env.SLICER_GIT_COMMIT = powershell(returnStdout: true, script: '(${env:GIT_LS_REMOTE_RESULT} -split "\\s+")[0]').trim()
-                                }
+                                // script {
+                                //     env.GIT_LS_REMOTE_RESULT = powershell(returnStdout: true, script: 'git ls-remote git@bitbucket.org:ltrace/slicer.git ${env:SLICER_BRANCH}').trim()                            
+                                //     env.SLICER_GIT_COMMIT = powershell(returnStdout: true, script: '(${env:GIT_LS_REMOTE_RESULT} -split "\\s+")[0]').trim()
+                                // }
                                 powershell '''
                                     docker-compose up -d geoslicerbase-windows-dev --wait
-                                    docker-compose exec -T geoslicerbase-windows-dev python ./geoslicerbase/tools/update_cmakelists_content.py --commit "${env:SLICER_GIT_COMMIT}"
+                                    docker-compose exec -T geoslicerbase-windows-dev python ./geoslicerbase/tools/update_cmakelists_content.py --commit "${env:SLICER_BRANCH}"
                                     docker-compose exec -T geoslicerbase-windows-dev python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --avoid-long-path --jobs "${env:THREADS}" --type "${env:BUILD_TYPE}"
                                 '''
                             }
@@ -88,15 +89,16 @@ pipeline {
                     }
                 }
                 stage("Linux") {
-                    agent {
-                            label "linux"
-                    }
                     options { skipDefaultCheckout() }
-                    when { 
+                    when {
+                        beforeAgent true;
                         anyOf {
                                 expression { return "${params.PLATFORM}" == "Linux"; } 
                                 expression { return "${params.PLATFORM}" == "Both"; } 
                         }
+                    }
+                    agent {
+                            label "linux"
                     }
                     stages {
                         stage('Build Image [Linux]') {
@@ -126,14 +128,16 @@ pipeline {
                             }
                             steps {                        
                                 // Check git tag related to current branch
-                                script {
-                                    env.SLICER_GIT_COMMIT = sh(returnStdout: true, script: "echo \$(git ls-remote git@bitbucket.org:ltrace/slicer.git \${SLICER_BRANCH}) | awk '{print \$1}'").trim()
-                                }
+                                // script {
+                                //     env.SLICER_GIT_COMMIT = sh(returnStdout: true, script: "echo \$(git ls-remote git@bitbucket.org:ltrace/slicer.git \${SLICER_BRANCH}) | awk '{print \$1}'").trim()
+                                // }
                                 sh '''
                                     docker-compose up -d geoslicerbase-linux --wait
-                                    docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/update_cmakelists_content.py --commit "${SLICER_GIT_COMMIT}"
-                                    docker-compose exec -T geoslicerbase-linux python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --avoid-long-path --jobs "${THREADS}" --type "${BUILD_TYPE}"
+                                    docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/update_cmakelists_content.py --commit "${SLICER_BRANCH}"
+                                    docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/build_and_pack.py --source /geoslicerbase --avoid-long-path --jobs "${THREADS}" --type "${BUILD_TYPE}"
                                 '''
+                                // docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/update_cmakelists_content.py --commit 9e2b29a
+                                // docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --avoid-long-path --jobs "8" --type "Release"
                             }
                             post {
                                 always {
