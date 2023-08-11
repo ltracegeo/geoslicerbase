@@ -29,8 +29,10 @@ RUN $exePath = "$env:TEMP + '\qt-unified-windows-x64-4.4.1-online.exe'" ; \
         --root C:\Qt --auto-answer telemetry-question=No,AssociateCommonFiletypes=Yes --accept-licenses --accept-obligations \ 
         --email giknakotru@vusra.com --pw LTRACEltrace123 --confirm-command --accept-messages --filter-packages "DisplayName=Qt 5.15.2"
 
-# Install Chocolatey
+# Install Chocolatey, version 1.4.0 due major version greater than 2 requires .NET Framework 4.8 which requires system reboot
+# (ref https://stackoverflow.com/questions/76470752/chocolatey-installation-in-docker-started-to-fail-restart-due-to-net-framework)
 ENV ChocolateyUseWindowsCompression false
+ENV chocolateyVersion=1.4.0 
 RUN iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) 
 
 # Install packages from Chocolatey
