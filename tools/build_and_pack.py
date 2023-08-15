@@ -36,7 +36,7 @@ def generate_project_command(args):
         command = f"cmake -S {args.source.as_posix()} -B {output_directory_path.as_posix()} -DCMAKE_BUILD_TYPE:STRING={args.type} -DSlicer_SKIP_ROOT_DIR_MAX_LENGTH_CHECK:BOOL=TRUE"
     else:
         command = f"cmake -S {args.source.as_posix()} -B {output_directory_path.as_posix()} -DCMAKE_BUILD_TYPE:STRING={args.type}"
-    print(f"generate_project_command {command}")
+
     return command
 
 
@@ -45,7 +45,6 @@ def build_command(args):
         command = f"msbuild GeoSlicer.sln /p:Configuration={args.type} /m:{args.jobs}"
     else:
         command = f"make -j{args.jobs}"
-    print(f"build_command {command}")
 
     return command
 
@@ -55,7 +54,6 @@ def generate_package_command(args):
         command = f"msbuild PACKAGE.vcxproj /p:Configuration={args.type} /m:{args.jobs}"
     else:
         command = f"make package"
-    print(f"generate_package_command {command}")
 
     return command
 
@@ -157,7 +155,7 @@ def export_application(slicer_build_file_path: Path):
     geoslicer_base_compressed_file_path = geoslicer_base_directory_path.parent / (
         geoslicer_base_directory_path.name + f".{archive_extension}"
     )
-    logger.debug(
+    logger.info(
         f"GeoSlicer base application compressed successfully! File path: {geoslicer_base_compressed_file_path.as_posix()}..."
     )
 
