@@ -149,7 +149,7 @@ def export_application(slicer_build_file_path: Path):
         geoslicer_base_directory_path.name
     )
     archive_format = "zip" if sys.platform == "win32" else "gztar"
-    shutil.make_archive(geoslicer_base_compressed_file_path, archive_format, geoslicer_base_directory_path)
+    shutil.make_archive(geoslicer_base_compressed_file_path, archive_format, geoslicer_base_directory_path.parent, geoslicer_base_directory_path.name)
 
     archive_extension = "zip" if sys.platform == "win32" else "tar.gz"
     geoslicer_base_compressed_file_path = geoslicer_base_directory_path.parent / (
