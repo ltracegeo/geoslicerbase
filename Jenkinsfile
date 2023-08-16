@@ -54,7 +54,7 @@ pipeline {
                             steps {                        
                                 powershell '''
                                     docker-compose up -d geoslicerbase-windows-dev --wait
-                                    docker-compose exec -T geoslicerbase-windows-dev python ./geoslicerbase/tools/update_cmakelists_content.py --commit "${env:SLICER_BRANCH}"
+                                    docker-compose exec -T geoslicerbase-windows-dev python ./geoslicerbase/tools/update_cmakelists_content.py --commit "${env:SLICER_COMMIT}"
                                     docker-compose exec -T geoslicerbase-windows-dev python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --avoid-long-path --jobs "${env:THREADS}" --type "${env:BUILD_TYPE}"
                                 '''
                             }
@@ -117,7 +117,7 @@ pipeline {
                             steps {                        
                                 sh '''
                                     docker-compose up -d geoslicerbase-linux --wait
-                                    docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/update_cmakelists_content.py --commit "${SLICER_BRANCH}"
+                                    docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/update_cmakelists_content.py --commit "${SLICER_COMMIT}"
                                     docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/build_and_pack.py --source /geoslicerbase --avoid-long-path --jobs "${THREADS}" --type "${BUILD_TYPE}"
                                 '''
                             }
