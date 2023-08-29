@@ -1,0 +1,36 @@
+version: "3"
+services:
+  geoslicerbase-windows:
+    image: geoslicerbase-windows:latest
+    build:
+      context: .
+      dockerfile: tools/docker/windows.Dockerfile
+      target: image-prod
+    volumes:
+      - ~/.oci/:C:/Users/ContainerAdministrator/.oci/
+      - ~/.ssh/:C:/Users/ContainerAdministrator/.ssh/
+    storage_opt:
+      size: '30G'
+  geoslicerbase-windows-dev:
+    image: geoslicerbase-windows-dev:latest
+    build:
+      context: .
+      dockerfile: tools/docker/windows.Dockerfile
+      target: image-dev
+    volumes:
+      - .:c:/geoslicerbase/
+      - ~/.oci/:C:/Users/ContainerAdministrator/.oci/
+      - ~/.ssh/:C:/Users/ContainerAdministrator/.ssh/
+    storage_opt:
+      size: '30G'
+  geoslicerbase-linux:
+    image: geoslicerbase-linux:latest
+    build:
+      context: .
+      dockerfile: tools/docker/centos.Dockerfile
+    volumes:
+      - .:/geoslicerbase
+      - ~/.ssh/:/root/.ssh/
+      - ~/.oci/:/root/.oci/
+    storage_opt:
+      size: '30G'
