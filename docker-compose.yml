@@ -5,24 +5,12 @@ services:
     build:
       context: .
       dockerfile: tools/docker/windows.Dockerfile
-      target: image-prod
-    volumes:
-      - ~/.oci/:C:/Users/ContainerAdministrator/.oci/
-      - ~/.ssh/:C:/Users/ContainerAdministrator/.ssh/
-    storage_opt:
-      size: '30G'
-  geoslicerbase-windows-dev:
-    image: geoslicerbase-windows-dev:latest
-    build:
-      context: .
-      dockerfile: tools/docker/windows.Dockerfile
-      target: image-dev
     volumes:
       - .:c:/geoslicerbase/
       - ~/.oci/:C:/Users/ContainerAdministrator/.oci/
       - ~/.ssh/:C:/Users/ContainerAdministrator/.ssh/
     storage_opt:
-      size: '30G'
+      size: '120G'
   geoslicerbase-linux:
     image: geoslicerbase-linux:latest
     build:
@@ -33,4 +21,4 @@ services:
       - ~/.ssh/:/root/.ssh/
       - ~/.oci/:/root/.oci/
     storage_opt:
-      size: '30G'
+      size: '120G'

@@ -2,7 +2,7 @@ pipeline {
     agent any
     options { skipDefaultCheckout() }
     parameters {
-        string(name: 'SLICER_COMMIT', defaultValue: "", description: 'The LTrace/Slicer.git commit hash to build with')
+        string(name: 'SLICER_COMMIT', defaultValue: "9e2b29a", description: 'The LTrace/Slicer.git commit hash to build with')
         choice(name: 'PLATFORM', choices: ['Windows', 'Linux', 'Both'], description: 'Select the desired Operational System to generate the application.')
         choice(name: 'BUILD_TYPE', choices: ['Release', 'Debug'], description: 'Select the build type.')
         choice(name: 'THREADS', choices: ['32', '16', '8', '4', '2', '1'], description: 'Select the thread\'s number to be used to compile.')
@@ -15,7 +15,6 @@ pipeline {
                     triggeredBy cause: 'UserIdCause'
                 }
             }
-            failFast true
             parallel {
                 stage("Windows") {
                     options { skipDefaultCheckout() }
@@ -38,7 +37,7 @@ pipeline {
                                 cleanWs()
                                 checkout scm  
                                 powershell '''
-                                    docker-compose build geoslicerbase-windows-dev
+                                    docker-compose build geoslicerbase-windows
                                 '''
                             }
                             post {
@@ -53,9 +52,15 @@ pipeline {
                             }
                             steps {                        
                                 powershell '''
-                                    docker-compose up -d geoslicerbase-windows-dev --wait
-                                    docker-compose exec -T geoslicerbase-windows-dev python ./geoslicerbase/tools/update_cmakelists_content.py --commit "${env:SLICER_COMMIT}"
-                                    docker-compose exec -T geoslicerbase-windows-dev python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --avoid-long-path --jobs "${env:THREADS}" --type "${env:BUILD_TYPE}"
+                                    docker-compose up -d geoslicerbase-windows --wait
+                                    docker-compose exec -T geoslicerbase-windows ./geoslicerbase/tools/update_cmakelists_content.ps1 -commit "${env:SLICER_COMMIT}"
+                                    docker-compose exec -T geoslicerbase-windows cmake -G "Visual Studio 16 2019" -A x64 -DQt5_DIR:PATH=C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5 -S C:/geoslicerbase -B C:/gsb
+                                    docker-compose exec -T geoslicerbase-windows cmake --build C:/gsb --config Release -j "${env:THREADS}"
+                                    docker-compose exec -T geoslicerbase-windows msbuild PACKAGE.vcxproj /p:Configuration=Release /m:"${env:THREADS}"
+                                    docker-compose exec -T geoslicerbase-windows choco install python --version=3.9.13 -y
+                                    docker-compose exec -T geoslicerbase-windows python -m pip install --upgrade pip==22.0.2
+                                    docker-compose exec -T geoslicerbase-windows python -m pip install -r ./geoslicerbase/tools/requirements.txt
+                                    docker-compose exec -T geoslicerbase-windows python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --only-export --avoid-long-path
                                 '''
                             }
                             post {

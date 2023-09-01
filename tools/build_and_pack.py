@@ -21,7 +21,7 @@ logger.setLevel(logging.INFO)
 
 
 
-def get_working_dir():
+def get_working_dir(args):
     if args.avoid_long_path and sys.platform == "win32":
         path = Path(Path.home().drive + "/gsb")
     else:
@@ -30,10 +30,11 @@ def get_working_dir():
     return path
 
 
-def generate_project_command(args):
-    output_directory_path = get_working_dir()
+def get_project_build_command(args):
+    output_directory_path = get_working_dir(args)
     if sys.platform == "win32":
-        command = f"cmake -S {args.source.as_posix()} -B {output_directory_path.as_posix()} -DCMAKE_BUILD_TYPE:STRING={args.type} -DSlicer_SKIP_ROOT_DIR_MAX_LENGTH_CHECK:BOOL=TRUE"
+        # command = f"""cmake -G 'Visual Studio 17 2022' -DQt5_DIR:PATH=C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5 -S {args.source.as_posix()} -B {output_directory_path.as_posix()}"""
+        command = ["cmake", "-G", "Visual Studio 16 2019", "-A", "x64", "-DQt5_DIR:PATH=C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5", "-S", args.source.as_posix(), "-B", output_directory_path.as_posix()]
     else:
         command = f"cmake -S {args.source.as_posix()} -B {output_directory_path.as_posix()} -DCMAKE_BUILD_TYPE:STRING={args.type}"
 
@@ -42,14 +43,15 @@ def generate_project_command(args):
 
 def build_command(args):
     if sys.platform == "win32":
-        command = f"msbuild GeoSlicer.sln /p:Configuration={args.type} /m:{args.jobs}"
+        output_directory_path = get_working_dir(args)
+        command = f"cmake --build {output_directory_path.as_posix()} --config {args.type}"
     else:
         command = f"make -j{args.jobs}"
 
     return command
 
 
-def generate_package_command(args):
+def get_package_command(args):
     if sys.platform == "win32":
         command = f"msbuild PACKAGE.vcxproj /p:Configuration={args.type} /m:{args.jobs}"
     else:
@@ -59,7 +61,11 @@ def generate_package_command(args):
 
 
 def process(args):
-    output_directory_path = get_working_dir()
+    if args.only_export:
+        only_export_process(args)
+        return
+
+    output_directory_path = get_working_dir(args)
     if args.no_cache and output_directory_path.exists():
         logger.info("Deleting old build directory remainings")
         shutil.rmtree(output_directory_path, onerror=onerror)
@@ -70,7 +76,7 @@ def process(args):
 
     # Run cmake to generate buildable project
     logger.info("Generating buildable project...")
-    command_as_list = generate_project_command(args).split()
+    command_as_list = get_project_build_command(args)
     run_subprocess(command_as_list, shell=subprocess_as_shell)
 
     # Build project
@@ -84,14 +90,14 @@ def process(args):
     if not slicer_build_file_path.exists():
         raise RuntimeError("Slicer-build folder not found in the project directory.")
 
-    command_as_list = generate_package_command(args).split()
+    command_as_list = get_package_command(args)
     run_subprocess(command_as_list, shell=subprocess_as_shell, cwd=slicer_build_file_path.as_posix())
 
     # Export
     if args.no_export:
         logger.info("Skipping the exporting step...")
     else:
-        export_application(slicer_build_file_path)
+        export_application(args, slicer_build_file_path)
 
 
 def find_geoslicer_base_application_directory_path(slicer_build_file_path: Path) -> Path:
@@ -136,7 +142,7 @@ def upload_file_2_bucket(input_file_path, bucket_output_directory, namespace, bu
     )
 
 
-def export_application(slicer_build_file_path: Path):
+def export_application(args, slicer_build_file_path: Path):
     geoslicer_base_directory_path = find_geoslicer_base_application_directory_path(slicer_build_file_path)
     if geoslicer_base_directory_path is None:
         raise RuntimeError(
@@ -160,15 +166,19 @@ def export_application(slicer_build_file_path: Path):
     )
 
     # Export
-    bucket_output_directory = f"GeoSlicer/base/{sys.platform}"
+    build_type = str(args.type).lower()
+    bucket_output_directory = f"GeoSlicer/base/{build_type}/{sys.platform}"
     bucket_name = "General_ltrace_files"
     namespace = "grrjnyzvhu1t"
     upload_file_2_bucket(geoslicer_base_compressed_file_path, bucket_output_directory, namespace, bucket_name)
 
 
-def run_subprocess(command, assert_exit_code=True, shell=True, cwd=None):
+def run_subprocess(command, assert_exit_code=True, shell=True, cwd=None, env=None):
     """Wrapper for running subprocess and reading its output"""
-    with subprocess.Popen(command, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True, shell=shell, cwd=cwd) as proc:
+    if isinstance(command, str):
+        command = command.split()
+
+    with subprocess.Popen(command, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True, shell=shell, cwd=cwd, env=env) as proc:
         for line in proc.stdout:
             print(f"\t{line}", end="")
 
@@ -197,6 +207,11 @@ def onerror(func, path, exc_info):
         raise
 
 
+def only_export_process(args):
+    output_directory_path = get_working_dir(args)
+    slicer_build_file_path = output_directory_path / "Slicer-build"
+    export_application(args, slicer_build_file_path)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Apply dynamic changes to CMakeLists.txt")
     parser.add_argument("--source", help="The source code directory path.", default=None)
@@ -205,6 +220,7 @@ if __name__ == "__main__":
     parser.add_argument("--no-export", action="store_true", help="Skip application exporting step", default=False)
     parser.add_argument("--no-cache", action="store_true", help="Delete old build files before starting process", default=False)
     parser.add_argument("--avoid-long-path", action="store_true", help="Avoid long path issues", default=False)
+    parser.add_argument("--only-export", action="store_true", help="Only export the generated package", default=False)
 
     args = parser.parse_args()
 

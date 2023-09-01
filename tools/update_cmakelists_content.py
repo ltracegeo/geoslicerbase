@@ -49,7 +49,9 @@ def process(args):
 
     new_data = (
         data[: match.start()]
-        + get_slicersource_fetchcontent_populate_string(repo=args.repository, commit_hash=args.commit)
+        + get_slicersource_fetchcontent_populate_string(
+            repo=args.repository, commit_hash=args.commit
+        )
         + data[match.end() :]
     )
 
@@ -59,8 +61,14 @@ def process(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Apply dynamic changes to CMakeLists.txt")
-    parser.add_argument("--commit", help="Specify the commit. Default to 'master' branch name.", default="master")
+    parser = argparse.ArgumentParser(
+        description="Apply dynamic changes to CMakeLists.txt"
+    )
+    parser.add_argument(
+        "--commit",
+        help="Specify the commit. Default to 'master' branch name.",
+        default="master",
+    )
     parser.add_argument(
         "--repository",
         help="The external repository to fetch. Default to the ltrace/Slicer.git url.",
@@ -70,7 +78,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.commit is None:
-        raise AttributeError("The commit hash, tags name or branch name is missing! Aborting process...")
+        raise AttributeError(
+            "The commit hash, tags name or branch name is missing! Aborting process..."
+        )
     if args.repository is None:
         raise AttributeError("The repository URL is missing! Aborting process...")
 
