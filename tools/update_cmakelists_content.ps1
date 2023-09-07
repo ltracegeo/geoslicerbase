@@ -1,6 +1,6 @@
 param (
     [string]$commit = "",
-    [string]$repository = "git@bitbucket.org:ltrace/slicer.git"
+    [string]$repository = '"${git_remote_url}/slicer.git"'
 )
 
 Write-Host "commit: $commit"

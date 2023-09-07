@@ -11,7 +11,7 @@ from pathlib import Path
 
 # Default variables
 REPO_FOLDER = Path(__file__).parent.parent
-DEFAULT_REPO = "git@bitbucket.org:ltrace/slicer.git"
+DEFAULT_REPO = r'"${git_remote_url}/slicer.git"'
 
 
 # Configure logger

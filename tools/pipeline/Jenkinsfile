@@ -2,7 +2,7 @@ pipeline {
     agent any
     options { skipDefaultCheckout() }
     parameters {
-        string(name: 'SLICER_COMMIT', defaultValue: "9e2b29a", description: 'The LTrace/Slicer.git commit hash to build with')
+        string(name: 'SLICER_COMMIT', defaultValue: "", description: 'The LTrace/Slicer.git commit hash to build with')
         choice(name: 'PLATFORM', choices: ['Windows', 'Linux', 'Both'], description: 'Select the desired Operational System to generate the application.')
         choice(name: 'BUILD_TYPE', choices: ['Release', 'Debug'], description: 'Select the build type.')
         choice(name: 'THREADS', choices: ['32', '16', '8', '4', '2', '1'], description: 'Select the thread\'s number to be used to compile.')
