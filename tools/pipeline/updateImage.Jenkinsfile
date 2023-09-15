@@ -2,10 +2,12 @@ pipeline {
     agent any
     options { skipDefaultCheckout() }
     parameters {
-        string(name: 'SLICER_COMMIT', defaultValue: "", description: 'The LTrace/Slicer.git commit hash to build with')
-        choice(name: 'PLATFORM', choices: ['Windows', 'Linux', 'Both'], description: 'Select the desired Operational System to generate the application.')
-        choice(name: 'BUILD_TYPE', choices: ['Release', 'Debug'], description: 'Select the build type.')
-        choice(name: 'THREADS', choices: ['32', '16', '8', '4', '2', '1'], description: 'Select the thread\'s number to be used to compile.')
+        string(name: "TAG", defaultValue: "latest", description: "The GeoSlicer base version to add as a tag")
+        choice(name: "PLATFORM", choices: ["Both", "Windows", "Linux"], description: "Select the desired Operational System to generate the application.")
+    }
+    environment {
+        OCI_DOCKER_REGISTRY_TOKEN_ID     = credentials("oci_docker_registry_token_id")
+        OCI_DOCKER_REGISTRY_TOKEN_PASSWORD = credentials("oci_docker_registry_token_password")
     }
     stages {
         stage("Parallel Stage") {
@@ -15,7 +17,6 @@ pipeline {
                     triggeredBy cause: 'UserIdCause'
                 }
             }
-            failFast true
             parallel {
                 stage("Windows") {
                     options { skipDefaultCheckout() }
@@ -37,33 +38,15 @@ pipeline {
                             steps {
                                 cleanWs()
                                 checkout scm  
-                                powershell '''
-                                    docker-compose build geoslicerbase-windows-dev
-                                '''
+                                powershell 'docker-compose build geoslicerbase-windows'
+                                powershell 'docker login gru.ocir.io -u "$env:OCI_DOCKER_REGISTRY_TOKEN_ID" -p "$env:OCI_DOCKER_REGISTRY_TOKEN_PASSWORD"'
+                                powershell 'docker tag geoslicerbase-windows gru.ocir.io/grrjnyzvhu1t/geoslicer/windows:$env:TAG'
+                                powershell 'docker push gru.ocir.io/grrjnyzvhu1t/geoslicer/windows:$env:TAG'
                             }
                             post {
                                 always {
-                                    powershell "docker image prune -f"
-                                }
-                            }
-                        }
-                        stage('Build & Pack [Windows]') {
-                            options {
-                                timeout(time: 15, unit: "HOURS")
-                            }
-                            steps {                        
-                                powershell '''
-                                    docker-compose up -d geoslicerbase-windows-dev --wait
-                                    docker-compose exec -T geoslicerbase-windows-dev python ./geoslicerbase/tools/update_cmakelists_content.py --commit "${env:SLICER_COMMIT}"
-                                    docker-compose exec -T geoslicerbase-windows-dev python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --avoid-long-path --jobs "${env:THREADS}" --type "${env:BUILD_TYPE}"
-                                '''
-                            }
-                            post {
-                                always {
-                                    powershell "docker-compose down --remove-orphans -v"
                                     powershell "docker system prune --force --filter 'until=3h'"
                                     powershell "docker volume prune --force"
-                                    archiveArtifacts artifacts: 'tools/docker/*.log', fingerprint: true, allowEmptyArchive: true
                                 }
                             }
                         }
@@ -100,33 +83,15 @@ pipeline {
                             steps {
                                 cleanWs()
                                 checkout scm  
-                                sh '''
-                                    docker-compose build geoslicerbase-linux
-                                   '''
+                                sh 'docker-compose build geoslicerbase-linux'
+                                sh 'docker login gru.ocir.io -u "$OCI_DOCKER_REGISTRY_TOKEN_ID" -p "$OCI_DOCKER_REGISTRY_TOKEN_PASSWORD"'
+                                sh 'docker tag geoslicerbase-linux gru.ocir.io/grrjnyzvhu1t/geoslicer/linux:$TAG'
+                                sh 'docker push gru.ocir.io/grrjnyzvhu1t/geoslicer/linux:$TAG'
                             }
                             post {
                                 always {
-                                    sh "docker image prune -f"
-                                }
-                            }
-                        }
-                        stage('Build & Pack [Linux]') {
-                            options {
-                                timeout(time: 15, unit: "HOURS")
-                            }
-                            steps {                        
-                                sh '''
-                                    docker-compose up -d geoslicerbase-linux --wait
-                                    docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/update_cmakelists_content.py --commit "${SLICER_COMMIT}"
-                                    docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/build_and_pack.py --source /geoslicerbase --avoid-long-path --jobs "${THREADS}" --type "${BUILD_TYPE}"
-                                '''
-                            }
-                            post {
-                                always {
-                                    sh "docker-compose down --remove-orphans -v"
                                     sh "docker system prune --force --filter 'until=3h'"
                                     sh "docker volume prune --force"
-                                    archiveArtifacts artifacts: 'tools/docker/*.log', fingerprint: true, allowEmptyArchive: true
                                 }
                             }
                         }

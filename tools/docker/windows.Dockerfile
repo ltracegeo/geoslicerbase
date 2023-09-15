@@ -1,16 +1,8 @@
-FROM python:3.9.7-windowsservercore as base
+ARG REPO=mcr.microsoft.com/dotnet/framework/runtime
+FROM $REPO:4.8-20230808-windowsservercore-ltsc2019
 
 # Change shell to prompt terminal as default shell for the followings commands
 SHELL ["cmd", "/S", "/C"]
-
-# Install Visual Studio C++ & Build tools
-RUN curl -SL --output vs_buildtools.exe https://aka.ms/vs/17/release/vs_buildtools.exe && \
-    start /w vs_buildtools.exe --quiet --wait --norestart --includeRecommended --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\BuildTools" --add Microsoft.Component.MSBuild --add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.CoreBuildTools --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest --add Microsoft.VisualStudio.Component.VC.v141.x86.x64 && \
-    del /q vs_buildtools.exe
-
-RUN curl -SL --output vs_community.exe https://aka.ms/vs/17/release/vs_community.exe && \
-    start /w vs_community.exe --quiet --wait --norestart --nocache --includeRecommended --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community" --add Microsoft.Component.MSBuild --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest --add Microsoft.VisualStudio.Component.VC.v141.x86.x64 && \
-    del /q vs_community.exe
 
 # Change shell to powershell as default shell for the followings commands
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'Continue'; $verbosePreference='Continue';"]
@@ -29,17 +21,13 @@ RUN $exePath = "$env:TEMP + '\qt-unified-windows-x64-4.4.1-online.exe'" ; \
         --root C:\Qt --auto-answer telemetry-question=No,AssociateCommonFiletypes=Yes --accept-licenses --accept-obligations \ 
         --email giknakotru@vusra.com --pw LTRACEltrace123 --confirm-command --accept-messages --filter-packages "DisplayName=Qt 5.15.2"
 
-# Install Chocolatey, version 1.4.0 due major version greater than 2 requires .NET Framework 4.8 which requires system reboot
-# (ref https://stackoverflow.com/questions/76470752/chocolatey-installation-in-docker-started-to-fail-restart-due-to-net-framework)
-ENV ChocolateyUseWindowsCompression false
-ENV chocolateyVersion=1.4.0 
 RUN iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) 
 
 # Install packages from Chocolatey
-RUN choco install git.install -y 
-RUN choco install 7zip.install -y
-RUN choco install cmake --version=3.22.1 -y
-RUN choco install nsis --version=3.07 -y
+RUN choco install git --version=2.42.0 -y 
+RUN choco install 7zip --version=23.1.0 -y
+RUN choco install cmake --version=3.27.4 -y
+RUN choco install nsis --version=3.09 -y
 
 # Enable long path
 RUN New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
@@ -51,11 +39,18 @@ RUN curl.exe -L 'https://objectstorage.sa-saopaulo-1.oraclecloud.com/p/jIBqg1698
     [Environment]::SetEnvironmentVariable('CUDA_PATH_V11_2', "$env:programfiles + '\NVIDIA GPU Computing Toolkit\CUDA\v11.2'", [System.EnvironmentVariableTarget]::Machine) ; \
     Remove-Item cuda_files.zip
 
+
+RUN choco install visualstudio2019buildtools -y --package-parameters "--quiet --wait --norestart --includeOptional"
+RUN choco install visualstudio2019-workload-vctools -y --package-parameters "--quiet --wait --norestart --includeOptional"
+
+# Change shell to powershell as default shell for the followings commands
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'Continue'; $verbosePreference='Continue';"]
+
 # Add git/bin to path (bash)
 RUN [Environment]::SetEnvironmentVariable('PATH', "$env:PATH + ';' + $env:programfiles + '\Git\usr\bin\'", [System.EnvironmentVariableTarget]::Machine)
 
 # Add msbuild to path
-RUN [Environment]::SetEnvironmentVariable('PATH', "$env:PATH + ';' + ${env:programfiles(x86)} + '\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin'", [System.EnvironmentVariableTarget]::Machine)
+RUN [Environment]::SetEnvironmentVariable('PATH', "$env:PATH + ';' + ${env:programfiles(x86)} + '\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin'", [System.EnvironmentVariableTarget]::Machine)
 
 # Add cmake to path
 RUN [Environment]::SetEnvironmentVariable('PATH', "$env:PATH + ';' + $env:programfiles + '\CMake\bin'", [System.EnvironmentVariableTarget]::Machine)
@@ -64,48 +59,15 @@ RUN [Environment]::SetEnvironmentVariable('PATH', "$env:PATH + ';' + $env:progra
 RUN [Environment]::SetEnvironmentVariable('GIT_EXECUTABLE', "$env:programfiles + '\Git\bin\git.exe'", [System.EnvironmentVariableTarget]::Machine)
 RUN [Environment]::SetEnvironmentVariable('Patch_EXECUTABLE', "$env:programfiles + '\Git\usr\bin\patch.exe'", [System.EnvironmentVariableTarget]::Machine) 
 
-# Update pip
-RUN python -m pip install --upgrade pip==22.0.2
-
 WORKDIR /geoslicerbase
-
-# Install tools dependencies
-COPY ./tools/requirements.txt ./tools/requirements.txt
-RUN python -m pip install -r ./tools/requirements.txt
 
 # Config git
 RUN git config --global --add safe.directory C:/geoslicerbase
 
-ARG SLICER_GIT_COMMIT
-ENV SLICER_GIT_COMMIT $SLICER_GIT_COMMIT
-
-ARG THREADS
-ENV THREADS $THREADS
-
-ARG BUILD_TYPE
-ENV BUILD_TYPE $BUILD_TYPE
-
+# Environemnt variables
 ENV PYTHONUNBUFFERED 1
 ENV PIP_DEFAULT_TIMEOUT 100
 
-FROM base as image-dev
-# As development image: Mount repository to avoid copying and keep container running forever
-
 WORKDIR /
-
-CMD ["cmd", "/c", "ping", "-t", "localhost", ">", "NUL"]
-
-FROM base as image-prod
-# As production image: Copy all context and keep container running forever
-
-COPY . .
-
-WORKDIR /
-
-RUN python ./geoslicerbase/tools/update_cmakelists_content.py --commit $ENV:SLICER_GIT_COMMIT
-
-# Build and pack application
-RUN python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --type $ENV:BUILD_TYPE --jobs $ENV:THREADS
-
 
 CMD ["cmd", "/c", "ping", "-t", "localhost", ">", "NUL"]
