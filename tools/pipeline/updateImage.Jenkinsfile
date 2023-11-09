@@ -1,6 +1,9 @@
 pipeline {
     agent any
-    options { skipDefaultCheckout() }
+    options {
+        skipDefaultCheckout()
+        throttle(['base_build'])
+    }
     parameters {
         string(name: "TAG", defaultValue: "latest", description: "The GeoSlicer base version to add as a tag")
         choice(name: "PLATFORM", choices: ["Both", "Windows", "Linux"], description: "Select the desired Operational System to generate the application.")
