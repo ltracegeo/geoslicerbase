@@ -17,7 +17,7 @@ set(DESCRIPTION_SUMMARY
   "Digital rocks platform by LTrace"
   )
 set(DESCRIPTION_FILE
-  ${Slicer_SOURCE_DIR}/README.txt
+  ${Slicer_SOURCE_DIR}/README.md
   )
 
 set(LAUNCHER_SPLASHSCREEN_FILE
