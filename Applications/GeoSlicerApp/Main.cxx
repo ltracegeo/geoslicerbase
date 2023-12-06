@@ -24,6 +24,8 @@
 #include "qSlicerApplicationHelper.h"
 #include "qSlicerStyle.h"
 
+#include "vtkSlicerVersionConfigure.h" // For Slicer_MAIN_PROJECT_VERSION_FULL
+
 namespace
 {
 
