@@ -1,6 +1,9 @@
 pipeline {
     agent any
-    options { skipDefaultCheckout() }
+    options { 
+        skipDefaultCheckout() 
+        throttle(['base_build'])
+    }
     parameters {
         string(name: 'SLICER_COMMIT', defaultValue: "", description: 'The LTrace/Slicer.git commit hash to build with')
         choice(name: 'PLATFORM', choices: ['Windows', 'Linux', 'Both'], description: 'Select the desired Operational System to generate the application.')

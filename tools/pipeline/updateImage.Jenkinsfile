@@ -1,30 +1,33 @@
 pipeline {
     agent any
-    options { skipDefaultCheckout() }
+    options {
+        skipDefaultCheckout()
+        throttle(['base_build'])
+    }
     parameters {
-        string(name: "TAG", defaultValue: "latest", description: "The GeoSlicer base version to add as a tag")
-        choice(name: "PLATFORM", choices: ["Both", "Windows", "Linux"], description: "Select the desired Operational System to generate the application.")
+        string(name: "TAG", defaultValue: "latest", description: "The GeoSlicer base version to add as a tag (ex: v2.2.0).")
+        booleanParam(name: "LATEST", defaultValue: true, description: "Select if this image should be tagged as 'latest' as well.")
+        choice(name: "PLATFORM", choices: ["Windows", "Linux"], description: "Select the desired Operational System to generate the application.")
     }
     environment {
         OCI_DOCKER_REGISTRY_TOKEN_ID     = credentials("oci_docker_registry_token_id")
         OCI_DOCKER_REGISTRY_TOKEN_PASSWORD = credentials("oci_docker_registry_token_password")
     }
     stages {
-        stage("Parallel Stage") {
+        stage("Start") {
             options { skipDefaultCheckout() }
             when {
                 allOf {
                     triggeredBy cause: 'UserIdCause'
                 }
             }
-            parallel {
+            stages {
                 stage("Windows") {
                     options { skipDefaultCheckout() }
                     when {
                         beforeAgent true;
                         anyOf {
                                 expression { return "${params.PLATFORM}" == "Windows"; } 
-                                expression { return "${params.PLATFORM}" == "Both"; } 
                         }
                     }
                     agent {
@@ -69,7 +72,6 @@ pipeline {
                         beforeAgent true;
                         anyOf {
                                 expression { return "${params.PLATFORM}" == "Linux"; } 
-                                expression { return "${params.PLATFORM}" == "Both"; } 
                         }
                     }
                     agent {
