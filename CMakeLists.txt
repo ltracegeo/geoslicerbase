@@ -45,7 +45,7 @@ if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
     GIT_REPOSITORY "${git_remote_url}/slicer.git"
-    GIT_TAG 5eaaed402bf7409f91ddde928480a802425d6d6d
+    GIT_TAG 4420f58076dcd60dd58316737515b52497b322b7
     GIT_PROGRESS 1
     )
 else()
