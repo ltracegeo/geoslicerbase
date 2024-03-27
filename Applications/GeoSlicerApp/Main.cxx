@@ -22,8 +22,7 @@
 // Slicer includes
 #include "qSlicerApplication.h"
 #include "qSlicerApplicationHelper.h"
-#include "qSlicerStyle.h"
-
+#include "vtkSlicerConfigure.h" // For Slicer_MAIN_PROJECT_APPLICATION_NAME
 #include "vtkSlicerVersionConfigure.h" // For Slicer_MAIN_PROJECT_VERSION_FULL
 
 namespace
@@ -33,9 +32,8 @@ namespace
 int SlicerAppMain(int argc, char* argv[])
 {
   typedef qGeoSlicerAppMainWindow SlicerMainWindowType;
-  typedef qSlicerStyle SlicerAppStyle;
   
-  qSlicerApplicationHelper::preInitializeApplication(argv[0], new SlicerAppStyle);
+  qSlicerApplicationHelper::preInitializeApplication(argv[0], new qAppStyle);
 
   qSlicerApplication app(argc, argv);
   if (app.returnCode() != -1)
