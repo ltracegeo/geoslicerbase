@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13.4)
+cmake_minimum_required(VERSION 3.16.3)
 
 set(ADDITIONAL_CXX_FLAGS /MP)
 set(ADDITIONAL_C_FLAGS /MP)
@@ -45,7 +45,7 @@ if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
     GIT_REPOSITORY "${git_remote_url}/slicer.git"
-    GIT_TAG 4420f58076dcd60dd58316737515b52497b322b7
+    GIT_TAG 3619a87f2622ef8dc6f5120dffec2c59f00c6a1e
     GIT_PROGRESS 1
     )
 else()
@@ -67,8 +67,8 @@ set(Slicer_ORGANIZATION_DOMAIN "ltrace.com.br")
 set(Slicer_ORGANIZATION_NAME   "LTrace")
 
 # Default home and favorite modules
-#set(Slicer_DEFAULT_HOME_MODULE "Home")
-#set(Slicer_DEFAULT_FAVORITE_MODULES "Data, Volumes, Models, Transforms, Markups, SegmentEditor")
+# set(Slicer_DEFAULT_HOME_MODULE "Home")
+# set(Slicer_DEFAULT_FAVORITE_MODULES "Data, Volumes, Models, Transforms, Markups, SegmentEditor")
 
 # Configure SuperBuild
 set(SUPERBUILD_TOPLEVEL_PROJECT Slicer)
@@ -79,7 +79,7 @@ include(ExternalProjectDependency)
 set(Slicer_ADDITIONAL_DEPENDENCIES
   )
 
-#  Enable listed remote modules from ITK 
+#  Enable listed remote modules from ITK
 set(Slicer_ITK_ADDITIONAL_MODULES
   )
 
@@ -114,7 +114,12 @@ if(WIN32)
   endif()
 endif()
 
+# Slicer options
+option(BUILD_TESTING                            "Build application test suite"                        OFF)
+option(Slicer_BUILD_APPLICATIONUPDATE_SUPPORT   "Build application update support"                    OFF)
+option(Slicer_BUILD_DOCUMENTATION               "Build documentation (Doxygen, sphinx, ...)"          OFF)
 if(WIN32)
+  option(Slicer_BUILD_WIN32_CONSOLE_LAUNCHER    "Build ${PROJECT_NAME} launcher executable as a console app on windows (displays console at application start)" OFF)
   option(Slicer_BUILD_WIN32_CONSOLE             "Build application executable as a console app"       OFF)
 endif()
 
@@ -124,6 +129,7 @@ option(Slicer_BUILD_EXTENSIONMANAGER_SUPPORT    "Build application with Extensio
 option(Slicer_BUILD_MULTIVOLUME_SUPPORT         "Build application with MultiVolume support"          ON)
 option(Slicer_BUILD_PARAMETERSERIALIZER_SUPPORT "Build application with parameter serializer support" ON)
 option(Slicer_USE_PYTHONQT                      "Build application with Python support"               ON)
+option(Slicer_USE_QtTesting                     "Build application with QtTesting support"            ON)
 option(Slicer_USE_SimpleITK                     "Build application with SimpleITK support"            ON)
 
 option(Slicer_BUILD_BRAINSTOOLS                 "Build application with BRAINSTools module"           ON)

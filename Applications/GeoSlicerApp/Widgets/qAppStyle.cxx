@@ -47,7 +47,7 @@ qAppStyle::~qAppStyle()
 {
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 QPalette qAppStyle::standardPalette()const
 {
   QPalette palette = this->Superclass::standardPalette();
