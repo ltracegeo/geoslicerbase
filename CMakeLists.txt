@@ -45,7 +45,7 @@ if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
     GIT_REPOSITORY "${git_remote_url}/slicer.git"
-    GIT_TAG dd002e95891bcf0248b06096a6b3596d2305ae4b
+    GIT_TAG 11c616a2c19df462b7c922fb5d5e8c9140252151
     GIT_PROGRESS 1
     )
 else()
@@ -234,18 +234,6 @@ FetchContent_Populate(${extension_name}
  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
  GIT_REPOSITORY https://github.com/SlicerRt/SlicerDebuggingTools.git
  GIT_TAG        e104b8d0d68f9623d9b878b98ba63976d5695e02
- GIT_PROGRESS   1
- QUIET
- )
-list(APPEND Slicer_EXTENSION_SOURCE_DIRS ${${extension_name}_SOURCE_DIR})
-
-# MonaiLabel
-set(extension_name "MonaiLabel")
-set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
-FetchContent_Populate(${extension_name}
- SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
- GIT_REPOSITORY https://github.com/fbordignon/MONAILabel.git
- GIT_TAG        8921bb9054628695cc88cbd9f7b2426bd0f85d05
  GIT_PROGRESS   1
  QUIET
  )

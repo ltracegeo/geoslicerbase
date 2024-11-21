@@ -1,4 +1,4 @@
-FROM slicer/slicer-base:latest as base
+FROM slicer/slicer-base:5.6 as base
 
 # Update pip
 RUN python -m pip install --upgrade pip==22.0.2
