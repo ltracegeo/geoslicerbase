@@ -57,7 +57,7 @@ ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
 WORKDIR /geoslicerbase
 
 # Update pip
-RUN python -m pip install --upgrade pip==22.0.2
+RUN python -m pip install --upgrade pip==22.3
 
 # Install tools dependencies
 COPY ./tools/requirements.txt ./tools/requirements.txt
@@ -75,24 +75,8 @@ ENV THREADS $THREADS
 ARG BUILD_TYPE
 ENV BUILD_TYPE $BUILD_TYPE
 
-FROM base as image-dev
-# As development image: Mount repository to avoid copying and keep container running forever
+RUN git config --global --add safe.directory '*'
 
 WORKDIR /
-
-CMD ["sh", "-c", "tail -f /dev/null"]
-
-FROM base as image-prod
-# As production image: Copy all context and keep container running forever
-
-COPY . .
-
-WORKDIR /
-
-RUN python ./geoslicerbase/tools/update_cmakelists_content.py --commit $ENV:SLICER_GIT_COMMIT
-
-# Build and pack application
-RUN python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --type $ENV:BUILD_TYPE --jobs $ENV:THREADS
-
 
 CMD ["sh", "-c", "tail -f /dev/null"]
