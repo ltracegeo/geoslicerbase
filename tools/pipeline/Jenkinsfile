@@ -66,7 +66,7 @@ pipeline {
                                     docker-compose exec -T geoslicerbase-windows cmake --build C:/gsb --config Release -j "${env:THREADS}"
                                     docker-compose exec -T geoslicerbase-windows msbuild C:/gsb/Slicer-Build/PACKAGE.vcxproj /p:Configuration=Release /m:"${env:THREADS}"
                                     docker-compose exec -T geoslicerbase-windows choco install python --version=3.9.13 -y
-                                    docker-compose exec -T geoslicerbase-windows python -m pip install --upgrade pip==22.0.2
+                                    docker-compose exec -T geoslicerbase-windows python -m pip install --upgrade pip==22.3
                                     docker-compose exec -T geoslicerbase-windows python -m pip install -r ./geoslicerbase/tools/requirements.txt
                                     docker-compose exec -T geoslicerbase-windows python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --only-export --avoid-long-path
                                 '''
