@@ -45,7 +45,7 @@ if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
     GIT_REPOSITORY "${git_remote_url}/slicer.git"
-    GIT_TAG 11c616a2c19df462b7c922fb5d5e8c9140252151
+    GIT_TAG b50f89dd852b906ad9ada4179fd26d74411a2796
     GIT_PROGRESS 1
     )
 else()
@@ -173,7 +173,7 @@ set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
 FetchContent_Populate(${extension_name}
  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
  GIT_REPOSITORY https://github.com/fbordignon/SlicerJupyter.git
- GIT_TAG        b586f3b85e5b0e31a9ad3e17ef13419cecd64b16
+ GIT_TAG        518e5ec1dcecfd3cfe68e106722dac7df412e2d0
  GIT_PROGRESS   1
  QUIET
  )
