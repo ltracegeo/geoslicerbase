@@ -10,7 +10,8 @@ services:
       - ~/.oci/:C:/Users/ContainerAdministrator/.oci/
       - ~/.ssh/:C:/Users/ContainerAdministrator/.ssh/
     storage_opt:
-      size: '120G'
+      size: '160G'
+    mem_limit: 24GB
   geoslicerbase-linux:
     image: geoslicerbase-linux:latest
     build:
@@ -21,4 +22,4 @@ services:
       - ~/.ssh/:/root/.ssh/
       - ~/.oci/:/root/.oci/
     storage_opt:
-      size: '120G'
+      size: '160G'
