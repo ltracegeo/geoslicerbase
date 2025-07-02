@@ -167,18 +167,6 @@ set(Slicer_EXTENSION_SOURCE_DIRS
 
 # Add remote extension source directories
 
-# SlicerJupyter
-set(extension_name "SlicerJupyter")
-set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
-FetchContent_Populate(${extension_name}
- SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
- GIT_REPOSITORY https://github.com/fbordignon/SlicerJupyter.git
- GIT_TAG        518e5ec1dcecfd3cfe68e106722dac7df412e2d0
- GIT_PROGRESS   1
- QUIET
- )
-list(APPEND Slicer_EXTENSION_SOURCE_DIRS ${${extension_name}_SOURCE_DIR})
-
 # SegmentMesher
 set(extension_name "SegmentMesher")
 set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
