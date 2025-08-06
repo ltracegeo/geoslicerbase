@@ -12,6 +12,8 @@ services:
     storage_opt:
       size: '160G'
     mem_limit: 24GB
+    environment:
+      - USING_DOCKER=1
   geoslicerbase-linux:
     image: geoslicerbase-linux:latest
     build:
@@ -23,3 +25,6 @@ services:
       - ~/.oci/:/root/.oci/
     storage_opt:
       size: '160G'
+    mem_limit: 24GB
+    environment:
+      - USING_DOCKER=1

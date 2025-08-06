@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.2.2-cudnn8-devel-ubuntu20.04 as base
+FROM nvidia/cuda:11.6.2-cudnn8-devel-ubuntu20.04 as base
 
 ENV OCI_CONFIG_FILE $HOME/.oci/config
 ENV PYTHONUNBUFFERED 1
@@ -78,5 +78,5 @@ ENV BUILD_TYPE $BUILD_TYPE
 RUN git config --global --add safe.directory '*'
 
 WORKDIR /
-
+ENV USING_DOCKER=1
 CMD ["sh", "-c", "tail -f /dev/null"]
