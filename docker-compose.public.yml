@@ -1,0 +1,28 @@
+version: "2"
+services:
+  geoslicerbase-windows:
+    image: geoslicerbase-windows:latest
+    build:
+      context: .
+      dockerfile: tools/docker/windows.Dockerfile
+    volumes:
+      - .:c:/geoslicerbase/
+      - ~/.ssh/:C:/Users/ContainerAdministrator/.ssh/
+    storage_opt:
+      size: '160G'
+    mem_limit: 24GB
+    environment:
+      - USING_DOCKER=1
+  geoslicerbase-linux:
+    image: geoslicerbase-linux:latest
+    build:
+      context: .
+      dockerfile: tools/docker/centos.Dockerfile
+    volumes:
+      - .:/geoslicerbase
+      - ~/.ssh/:/root/.ssh/
+    storage_opt:
+      size: '160G'
+    mem_limit: 24GB
+    environment:
+      - USING_DOCKER=1

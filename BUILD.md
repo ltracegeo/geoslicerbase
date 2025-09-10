@@ -22,13 +22,13 @@ The easiest way to build GeoSlicer is by using the provided Docker containers. T
     **For Windows:**
 
     ```bash
-    docker compose up -d geoslicerbase-windows --wait --build
+    docker compose -f docker-compose.public.yml up  -d geoslicerbase-windows --wait --build
     ```
 
     **For Linux:**
 
     ```bash
-    docker compose up -d geoslicerbase-linux --wait --build
+    docker compose -f docker-compose.public.yml up -d geoslicerbase-linux --wait --build
     ```
 
 2.  **Update CMakeLists.txt:**
@@ -54,13 +54,13 @@ The easiest way to build GeoSlicer is by using the provided Docker containers. T
     **For Windows:**
 
     ```bash
-    docker compose exec -T geoslicerbase-windows python c:/geoslicerbase/tools/build_and_pack.py --source c:/geoslicerbase --avoid-long-path --jobs 32 --type Release
+    docker compose exec -T geoslicerbase-windows python c:/geoslicerbase/tools/build_and_pack.py --source c:/geoslicerbase --avoid-long-path --jobs 32 --type Release --no-export
     ```
 
     **For Linux:**
 
     ```bash
-    docker compose exec -T geoslicerbase-linux python /geoslicerbase/tools/build_and_pack.py --source /geoslicerbase --jobs 32 --type Release
+    docker compose exec -T geoslicerbase-linux python /geoslicerbase/tools/build_and_pack.py --source /geoslicerbase --jobs 32 --type Release --no-export
     ```
 
 4.  **Shutdown the Docker Container:**
