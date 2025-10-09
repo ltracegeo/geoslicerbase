@@ -22,7 +22,7 @@ The easiest way to build GeoSlicer is by using the provided Docker containers. T
     **For Windows:**
 
     ```bash
-    docker compose -f docker-compose.public.yml up  -d geoslicerbase-windows --wait --build
+    docker compose -f docker-compose.public.yml up -d geoslicerbase-windows --wait --build
     ```
 
     **For Linux:**
@@ -38,13 +38,13 @@ The easiest way to build GeoSlicer is by using the provided Docker containers. T
     **For Windows:**
 
     ```bash
-    docker compose exec -T geoslicerbase-windows python c:/geoslicerbase/tools/update_cmakelists_content.py --commit 732c54f43f0b3bb28592592b019721f0d28aad33 --repository git@github.com:ltracegeo/slicer.git
+    docker compose exec -T geoslicerbase-windows python c:/geoslicerbase/tools/update_cmakelists_content.py --commit 8c6219abd3f171f938fd5d003cd551db20842c7e --repository https://github.com/ltracegeo/Slicer.git
     ```
 
     **For Linux:**
 
     ```bash
-    docker compose exec -T geoslicerbase-linux python /geoslicerbase/tools/update_cmakelists_content.py --commit 732c54f43f0b3bb28592592b019721f0d28aad33 --repository git@github.com:ltracegeo/slicer.git
+    docker compose exec -T geoslicerbase-linux python /geoslicerbase/tools/update_cmakelists_content.py --commit 8c6219abd3f171f938fd5d003cd551db20842c7e --repository https://github.com/ltracegeo/Slicer.git
     ```
 
 3.  **Build and Package GeoSlicer:**
@@ -54,13 +54,13 @@ The easiest way to build GeoSlicer is by using the provided Docker containers. T
     **For Windows:**
 
     ```bash
-    docker compose exec -T geoslicerbase-windows python c:/geoslicerbase/tools/build_and_pack.py --source c:/geoslicerbase --avoid-long-path --jobs 32 --type Release --no-export
+    docker compose exec -T geoslicerbase-windows python c:/geoslicerbase/tools/build_and_pack.py --source c:/geoslicerbase --avoid-long-path --jobs 8 --type Release --no-export
     ```
 
     **For Linux:**
 
     ```bash
-    docker compose exec -T geoslicerbase-linux python /geoslicerbase/tools/build_and_pack.py --source /geoslicerbase --jobs 32 --type Release --no-export
+    docker compose exec -T geoslicerbase-linux python /geoslicerbase/tools/build_and_pack.py --source /geoslicerbase --jobs 8 --type Release --no-export
     ```
 
 4.  **Shutdown the Docker Container:**

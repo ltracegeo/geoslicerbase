@@ -7,7 +7,6 @@ services:
       dockerfile: tools/docker/windows.Dockerfile
     volumes:
       - .:c:/geoslicerbase/
-      - ~/.ssh/:C:/Users/ContainerAdministrator/.ssh/
     storage_opt:
       size: '160G'
     mem_limit: 24GB
@@ -20,7 +19,6 @@ services:
       dockerfile: tools/docker/centos.Dockerfile
     volumes:
       - .:/geoslicerbase
-      - ~/.ssh/:/root/.ssh/
     storage_opt:
       size: '160G'
     mem_limit: 24GB
