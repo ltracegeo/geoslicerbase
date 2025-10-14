@@ -17,4 +17,5 @@ WORKDIR /
 
 RUN git config --global --add safe.directory '*'
 
+ENV USING_DOCKER=1
 CMD ["sh", "-c", "tail -f /dev/null"]

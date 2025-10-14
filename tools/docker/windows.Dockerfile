@@ -28,21 +28,15 @@ RUN choco install git --version=2.42.0 -y
 RUN choco install 7zip --version=23.1.0 -y
 RUN choco install cmake --version=3.27.4 -y
 RUN choco install nsis --version=3.09 -y
+RUN choco install python --version=3.9.13 -y
+
+# Install python & pacakges 
+RUN python -m pip install --upgrade pip==25.0.1
+COPY ./tools/requirements.txt c:/geoslicerbase/tools/requirements.txt
+RUN python -m pip install -r c:/geoslicerbase/tools/requirements.txt
 
 # Enable long path
 RUN New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
-
-# Change shell to prompt terminal as default shell for the followings commands
-SHELL ["cmd", "/S", "/C"]
-RUN set filePath=%TEMP%\cuda_files.zip && \
-    curl -fSLo %filePath% "https://objectstorage.sa-saopaulo-1.oraclecloud.com/p/jIBqg1698YUbQelonErDUso7SREleH2foxQw5W1CDyxmZTeCrkFxBNizA0c8d3tx/n/grrjnyzvhu1t/b/share/o/GeoSlicer/NVIDIA%20GPU%20Computing%20Toolkit.zip" && \
-    7z x %filePath% -o%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.2 && \
-    set CUDA_PATH_V11_2=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.2 && \
-    setx CUDA_PATH_V11_2 "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v11.2" /M && \
-    del %filePath%
-
-# Change shell to powershell as default shell for the followings commands
-SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'Continue'; $verbosePreference='Continue';"]
 
 RUN choco install visualstudio2019buildtools -y --package-parameters "--quiet --wait --norestart --includeOptional"
 RUN choco install visualstudio2019-workload-vctools -y --package-parameters "--quiet --wait --norestart --includeOptional"
@@ -80,6 +74,7 @@ ENV BUILD_TYPE $BUILD_TYPE
 
 ENV PYTHONUNBUFFERED 1
 ENV PIP_DEFAULT_TIMEOUT 100
+ENV USING_DOCKER=1
 
 RUN git config --global --add safe.directory '*'
 
