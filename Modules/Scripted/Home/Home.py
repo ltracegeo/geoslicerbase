@@ -177,7 +177,7 @@ class HomeLogic(ScriptedLoadableModuleLogic):
         else:
           logging.error(message)
       slicer.util.mainWindow().hide()
-      slicer.util.exit(slicer.util.EXIT_FAILURE)
+      slicer.util.exit(status)
     qt.QTimer.singleShot(0, _exitApplication)  
   
   
