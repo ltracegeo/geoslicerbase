@@ -36,10 +36,6 @@ public:
 
 public slots:
   void on_HelpAboutGeoSlicerAppAction_triggered();
-  void on_HelpKeyboardShortcutsAction_triggered();
-  void on_HelpBrowseTutorialsAction_triggered();
-  void on_HelpInterfaceDocumentationAction_triggered();
-  void on_HelpReportBugOrFeatureRequestAction_triggered();
 
 protected:
   qGeoSlicerAppMainWindow(qGeoSlicerAppMainWindowPrivate* pimpl, QWidget* parent);

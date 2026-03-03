@@ -16,7 +16,7 @@ services:
     image: geoslicerbase-linux:latest
     build:
       context: .
-      dockerfile: tools/docker/centos.Dockerfile
+      dockerfile: tools/docker/linux.Dockerfile
     volumes:
       - .:/geoslicerbase
     storage_opt:
