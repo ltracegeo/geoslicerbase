@@ -7,7 +7,7 @@ pipeline {
     parameters {
         string(name: 'SLICER_COMMIT', defaultValue: "", description: 'The LTrace/Slicer.git commit hash to build with')
         choice(name: 'PLATFORM', choices: ['Windows', 'Linux', 'Both'], description: 'Select the desired Operational System to generate the application.')
-        choice(name: 'BUILD_TYPE', choices: ['Release', 'Debug'], description: 'Select the build type.')
+        choice(name: 'BUILD_TYPE', choices: ['Release', 'Debug', 'RelWithDebInfo'], description: 'Select the build type.')
         choice(name: 'THREADS', choices: ['32', '16', '8', '4', '2', '1'], description: 'Select the thread\'s number to be used to compile.')
     }
     environment {
@@ -60,11 +60,10 @@ pipeline {
                             }
                             steps {                        
                                 script {
-                                    def build_mode = ("${params.BUILD_TYPE}" == "Release") ? "Release" : "RelWithDebInfo"
                                     powershell """
                                         docker-compose up -d geoslicerbase-windows --wait
                                         docker-compose exec -T geoslicerbase-windows python ./geoslicerbase/tools/update_cmakelists_content.py --commit "${env:SLICER_COMMIT}"
-                                        docker-compose exec -T geoslicerbase-windows python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --avoid-long-path --jobs "${env:THREADS}" --type "${build_mode}"
+                                        docker-compose exec -T geoslicerbase-windows python ./geoslicerbase/tools/build_and_pack.py --source ./geoslicerbase --avoid-long-path --jobs "${env:THREADS}" --type "${params.BUILD_TYPE}"
                                     """
                                 }
                             }
@@ -125,12 +124,11 @@ pipeline {
                                 timeout(time: 15, unit: "HOURS")
                             }
                             steps {
-                                script {
-                                    def build_mode = (params.BUILD_TYPE == "Release") ? "Release" : "RelWithDebInfo"
+                                script {                                    
                                     sh """
                                         docker-compose up -d geoslicerbase-linux --wait
                                         docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/update_cmakelists_content.py --commit "${SLICER_COMMIT}"
-                                        docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/build_and_pack.py --source /geoslicerbase --avoid-long-path --jobs "${THREADS}" --type "${build_mode}"
+                                        docker-compose exec -T geoslicerbase-linux python /geoslicerbase/tools/build_and_pack.py --source /geoslicerbase --avoid-long-path --jobs "${THREADS}" --type "${params.BUILD_TYPE}"
                                     """
                                 }
                             }

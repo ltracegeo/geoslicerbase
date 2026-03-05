@@ -299,7 +299,7 @@ def _get_target_directory(args: argparse.Namespace) -> Path:
     build_type = str(args.type).lower()
 
     if os.environ.get("USING_DOCKER", 0) == 0:
-        return get_working_dir() / "build" / build_type
+        return get_working_dir(args) / "build" / build_type
 
     if sys.platform == "win32":
         return Path(Path.home().drive) / "geoslicerbase" / "build" / build_type
