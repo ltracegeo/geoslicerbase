@@ -46,7 +46,7 @@ if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
     GIT_REPOSITORY "${git_remote_url}/slicer.git"
-    GIT_TAG bf2a1bb0107d22b80d777bd0f37567e84c0e2177
+    GIT_TAG a6c169e51a2ab1e0a845979ff5c86e6246afec11
     GIT_PROGRESS 1
     )
 else()
@@ -128,7 +128,7 @@ option(Slicer_BUILD_DICOM_SUPPORT               "Build application with DICOM su
 option(Slicer_BUILD_DIFFUSION_SUPPORT           "Build application with Diffusion support"            ON)
 option(Slicer_BUILD_EXTENSIONMANAGER_SUPPORT    "Build application with ExtensionManager support"     ON)
 option(Slicer_BUILD_MULTIVOLUME_SUPPORT         "Build application with MultiVolume support"          ON)
-option(Slicer_BUILD_PARAMETERSERIALIZER_SUPPORT "Build application with parameter serializer support" ON)
+option(Slicer_BUILD_PARAMETERSERIALIZER_SUPPORT "Build application with parameter serializer support" OFF)
 option(Slicer_USE_PYTHONQT                      "Build application with Python support"               ON)
 option(Slicer_USE_QtTesting                     "Build application with QtTesting support"            ON)
 option(Slicer_USE_SimpleITK                     "Build application with SimpleITK support"            ON)
