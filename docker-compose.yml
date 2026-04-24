@@ -9,7 +9,7 @@ services:
       - ~/.oci/:C:/Users/ContainerAdministrator/.oci/
       - ~/.ssh/:C:/Users/ContainerAdministrator/.ssh/
     storage_opt:
-      size: '160G'
+      size: '160GB'
     mem_limit: 24GB
     environment:
       - USING_DOCKER=1

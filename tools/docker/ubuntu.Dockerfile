@@ -1,5 +1,5 @@
 FROM nvidia/cuda:11.6.2-cudnn8-devel-ubuntu20.04 as base
-
+# GeoSlicer version < 2.9.0
 ENV OCI_CONFIG_FILE $HOME/.oci/config
 ENV PYTHONUNBUFFERED 1
 ENV PIP_DEFAULT_TIMEOUT 100
