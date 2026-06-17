@@ -24,20 +24,25 @@ ADD ${CHANNEL_URL} C:\TEMP\VisualStudio.chman
 #   - MSVC v143 toolset (VS2022 x64)
 #   - MSVC v143 14.39 toolset - pinned version known to work with VTK/ITK
 #   - VC++ Redistributable (msvcp140.dll etc) - required for CMake try_run
-#   - Windows10SDK.20348 - installs runtime redist DLLs only (NOT the full SDK headers/libs)
+#   - Windows10SDK.18362 - installs runtime redist DLLs only (NOT the full SDK headers/libs)
 #     The full SDK is installed separately below via winsdksetup.exe
 # NOTE: VisualStudio.chman is copied to C:\VS before TEMP cleanup so that vswhere.exe
 #       can validate the instance registration (it checks channelUri path exists)
-RUN `
-    curl -SL --output C:\TEMP\vs_buildtools.exe https://aka.ms/vs/17/release/vs_buildtools.exe `
+RUN curl -SL --output C:\TEMP\vs_buildtools.exe https://aka.ms/vs/17/release/vs_buildtools.exe `
     && (call C:\TEMP\Install.cmd C:\TEMP\vs_buildtools.exe --quiet --wait --norestart --nocache `
         --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\BuildTools" `
         --channelUri C:\TEMP\VisualStudio.chman `
         --installChannelUri C:\TEMP\VisualStudio.chman `
         --add Microsoft.VisualStudio.Workload.VCTools `
-        --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
-        --add Microsoft.VisualStudio.Component.VC.14.39.17.9.x86.x64 `
-        --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest `
+        --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64) `
+    && exit /b 0
+
+RUN (call C:\TEMP\Install.cmd C:\TEMP\vs_buildtools.exe --quiet --wait --norestart --nocache `
+        --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\BuildTools" `
+        --channelUri C:\TEMP\VisualStudio.chman `
+        --installChannelUri C:\TEMP\VisualStudio.chman `
+        --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest  `
+        --add Microsoft.VisualStudio.Component.VC.14.39.17.12.x86.x64 `
         --add Microsoft.VisualStudio.Component.Windows10SDK.20348) `
     && del /q C:\TEMP\vs_buildtools.exe `
     && if not exist "C:\VS" md "C:\VS" `
@@ -78,7 +83,7 @@ RUN $instanceBase = 'C:\ProgramData\Microsoft\VisualStudio\Packages\_Instances';
     }
 
 # Install the full Windows 10 SDK 20348 (headers + libraries).
-RUN curl.exe -SL --output C:\TEMP\winsdksetup.exe https://go.microsoft.com/fwlink/?linkid=2120843; `
+RUN curl.exe -SL --output C:\TEMP\winsdksetup.exe https://go.microsoft.com/fwlink/?linkid=2164145; `
     Start-Process -FilePath 'C:\TEMP\winsdksetup.exe' -Wait -ArgumentList `
         '/quiet', '/norestart', '/features', 'OptionId.DesktopCPPx64'; `
     Remove-Item 'C:\TEMP\winsdksetup.exe' -Force -ErrorAction SilentlyContinue; `

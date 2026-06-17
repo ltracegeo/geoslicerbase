@@ -1,7 +1,7 @@
 Build and Package GeoSlicer
 ==============================
 
-This document summarizes how to build and package GeoSlicer on Windows and Linux. Instructions for macOS are similar.
+This document summarizes how to build and package GeoSlicer on Windows and Linux.
 For more details, see [3D Slicer Developer Wiki](https://slicer.readthedocs.io/en/latest/developer_guide/index.html)
 
 ## Building with Docker (Recommended)
@@ -73,40 +73,63 @@ The easiest way to build GeoSlicer is by using the provided Docker containers. T
 
 ## Manual Build
 
-If you prefer to build GeoSlicer manually, firstly you need to modify `CMakeLists.txt` to specify the Slicer fork repository URL into 'git_remote_url' and the specific commit into 'GIT_TAG' to use.
- 
+If you prefer to build GeoSlicer manually, ensure your system meets the requirements. You can follow the [3D Slicer build instructions](https://slicer.readthedocs.io/en/latest/developer_guide/build_instructions/index.html) to set up your environment for your specific platform.
 
-The `CMakeLists.txt` file is configured to automatically determine the remote URL of the Slicer repository. However, if you are building from a different fork and need to specify a different repository, you can specify the URL.
+### Prerequisites
 
-**1. Modify `CMakeLists.txt`:**
+*   **Qt 5.15.2**
+*   **CMake 3.16.3+**
+*   **Git**
+*   **Python 3.12+** (for helper scripts)
+*   **Visual Studio 2022** (Windows) or **GCC/Clang** (Linux)
 
-Open `CMakeLists.txt` and locate the `set` statement for `git_remote_url` and overwrite the URL with your fork:
+### Build Steps
 
-# Define a variable to store the result of the command
-```cmake
-set(git_remote_url "git@github.com:ltracegeo")
+#### 1. Update CMakeLists.txt
+
+The `CMakeLists.txt` is configured to automatically detect the remote URL of the Slicer repository. However, you often need to specify a particular fork or commit. You can do this manually or using the provided helper script.
+
+**Using the helper script (Recommended):**
+
+```bash
+python tools/update_cmakelists_content.py --commit <COMMIT_HASH> --repository <REPOSITORY_URL>
 ```
 
-Now locate the `FetchContent_Populate(slicersources` section and update the `GIT_TAG` with a valid commit
+**Manual modification:**
+
+Open `CMakeLists.txt` and locate the `FetchContent_Populate(slicersources ...)` section. Update the `GIT_REPOSITORY` and `GIT_TAG` as needed:
 
 ```cmake
-# Slicer sources
-include(FetchContent)
-if(NOT DEFINED slicersources_SOURCE_dir)
-  # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
-  FetchContent_Populate(slicersources
-    GIT_REPOSITORY "${git_remote_url}/slicer.git"
-    GIT_TAG 732c54f43f0b3bb28592592b019721f0d28aad33
-    GIT_PROGRESS 1
-    )
-...
+FetchContent_Populate(slicersources
+  GIT_REPOSITORY "https://github.com/ltracegeo/slicer.git"
+  GIT_TAG 8c6219abd3f171f938fd5d003cd551db20842c7e
+  GIT_PROGRESS 1
+)
 ```
 
-**2. Follow 3D Slicer Build Instructions:**
+#### 2. Configure and Build
 
-Once the `CMakeLists.txt` is configured, follow the official 3D Slicer build instructions for your operating system: [3D Slicer Build Instructions](https://slicer.readthedocs.io/en/latest/developer_guide/build_instructions/index.html)
+You can use the `build_and_pack.py` script locally if your environment is correctly configured (e.g., `Qt5_DIR` is set or in a standard location).
 
- 
+**Windows:**
+
+```bash
+python tools/build_and_pack.py --source . --avoid-long-path --jobs 8 --type Release --no-export
+```
+
+**Linux:**
+
+```bash
+python tools/build_and_pack.py --source . --jobs 8 --type Release --no-export
+```
+
+Alternatively, you can use standard CMake commands,  following the official [3D Slicer build instructions](https://slicer.readthedocs.io/en/latest/developer_guide/build_instructions/index.html) for your operating system:
+
+```bash
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build . --config Release -j 8
+```
 
 ## Troubleshooting
 
