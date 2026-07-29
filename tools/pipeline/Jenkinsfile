@@ -13,6 +13,8 @@ pipeline {
     environment {
         OCI_DOCKER_REGISTRY_TOKEN_ID     = credentials("oci_docker_registry_token_id")
         OCI_DOCKER_REGISTRY_TOKEN_PASSWORD = credentials("oci_docker_registry_token_password")
+        USER_ID = sh(script: 'id -u', returnStdout: true).trim()
+        GROUP_ID = sh(script: 'id -g', returnStdout: true).trim()
     }
     stages {
         stage("Parallel Stage") {
