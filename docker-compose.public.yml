@@ -7,6 +7,7 @@ services:
       dockerfile: tools/docker/windows.Dockerfile
     volumes:
       - .:c:/geoslicerbase/
+      - ~/.ssh/:C:/Users/ContainerAdministrator/.ssh/
     storage_opt:
       size: '160G'
     mem_limit: 24GB
@@ -17,8 +18,12 @@ services:
     build:
       context: .
       dockerfile: tools/docker/linux.Dockerfile
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
     volumes:
       - .:/geoslicerbase
+      - ~/.ssh/:/home/ltrace/.ssh/
     storage_opt:
       size: '160G'
     mem_limit: 24GB
