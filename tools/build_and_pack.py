@@ -8,6 +8,7 @@ import logging
 import os
 import shutil
 import oci
+import traceback
 
 from pathlib import Path
 
@@ -15,9 +16,16 @@ from pathlib import Path
 # Configure logger
 log_file_path = Path(__file__).parent / "build.log"
 logger = logging.getLogger(__name__)
-logger.addHandler(logging.StreamHandler())
-logger.addHandler(logging.FileHandler(filename=log_file_path.as_posix()))
 logger.setLevel(logging.INFO)
+formatter = logging.Formatter(
+    "%(asctime)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+)
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
+file_handler = logging.FileHandler(filename=log_file_path.as_posix())
+file_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
+logger.addHandler(file_handler)
 
 
 def get_working_dir(args):
@@ -35,7 +43,7 @@ def get_project_build_command(args):
         command = [
             "cmake",
             "-G",
-            "Visual Studio 16 2019",
+            "Visual Studio 17 2022",
             "-A",
             "x64",
             "-DQt5_DIR:PATH=C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5",
@@ -71,6 +79,31 @@ def get_package_command(args):
     return command
 
 
+def get_clean_env_for_build() -> dict:
+    """Return a copy of the environment variables.
+        For Windows, all the Python-related paths are removed due to a known issue regarding CMake.
+        For Linux, the environment is not modified.
+
+    Returns:
+        dict: the environment variables
+    """
+    if sys.platform.startswith("linux"):
+        return os.environ.copy()
+
+    """Return a copy of the environment variables with all Python-related paths removed."""
+    env = os.environ.copy()
+    if "PYTHONPATH" in env:
+        del env["PYTHONPATH"]
+
+    path_sep = os.pathsep
+    if "PATH" in env:
+        env["PATH"] = path_sep.join(
+            [p for p in env["PATH"].split(path_sep) if "python" not in p.lower()]
+        )
+
+    return env
+
+
 def process(args):
     if args.only_export:
         only_export_process(args)
@@ -84,17 +117,21 @@ def process(args):
     output_directory_path.mkdir(exist_ok=True)
 
     subprocess_as_shell = sys.platform == "win32"
+    env = get_clean_env_for_build()
 
     # Run cmake to generate buildable project
     logger.info("Generating buildable project...")
     command_as_list = get_project_build_command(args)
-    run_subprocess(command_as_list, shell=subprocess_as_shell)
+    run_subprocess(command_as_list, shell=subprocess_as_shell, env=env)
 
     # Build project
     logger.info("Building project...")
     command_as_list = build_command(args).split()
     run_subprocess(
-        command_as_list, shell=subprocess_as_shell, cwd=output_directory_path.as_posix()
+        command_as_list,
+        shell=subprocess_as_shell,
+        cwd=output_directory_path.as_posix(),
+        env=env,
     )
 
     # Pack the application
@@ -108,13 +145,11 @@ def process(args):
         command_as_list,
         shell=subprocess_as_shell,
         cwd=slicer_build_file_path.as_posix(),
+        env=env,
     )
 
     # Export
-    if args.no_export:
-        logger.info("Skipping the exporting step...")
-    else:
-        export_application(args, slicer_build_file_path)
+    export_application(args, slicer_build_file_path)
 
 
 def find_geoslicer_base_application_directory_path(
@@ -176,8 +211,8 @@ def export_application(args, slicer_build_file_path: Path):
 
     # Compress application folder
     logger.info("Compressing GeoSlicer base application directory...")
-    geoslicer_base_compressed_file_path = geoslicer_base_directory_path.parent / (
-        geoslicer_base_directory_path.name
+    geoslicer_base_compressed_file_path = (
+        _get_target_directory(args) / geoslicer_base_directory_path.name
     )
     archive_format = "zip" if sys.platform == "win32" else "gztar"
     shutil.make_archive(
@@ -195,7 +230,11 @@ def export_application(args, slicer_build_file_path: Path):
         f"GeoSlicer base application compressed successfully! File path: {geoslicer_base_compressed_file_path.as_posix()}..."
     )
 
-    # Export
+    if args.no_export:
+        logger.info("Skipping the exporting to bucket step...")
+        return
+
+    # Export to bucket
     build_type = str(args.type).lower()
     bucket_output_directory = f"GeoSlicer/base/{build_type}/{sys.platform}"
     bucket_name = "General_ltrace_files"
@@ -221,9 +260,14 @@ def run_subprocess(command, assert_exit_code=True, shell=True, cwd=None, env=Non
         shell=shell,
         cwd=cwd,
         env=env,
+        encoding="utf-8",
+        errors="replace",
     ) as proc:
-        for line in proc.stdout:
-            print(f"\t{line}", end="")
+        try:
+            for line in proc.stdout:
+                print(f"\t{line}", end="")
+        except Exception as error:
+            logger.warning(f"SUBPROCESS WARNING: {error}\n{traceback.format_exc()}")
 
     if assert_exit_code and proc.returncode != 0:
         raise subprocess.CalledProcessError(proc.returncode, proc.args)
@@ -251,6 +295,18 @@ def onerror(func, path, exc_info):
         raise
 
 
+def _get_target_directory(args: argparse.Namespace) -> Path:
+    build_type = str(args.type).lower()
+
+    if os.environ.get("USING_DOCKER", 0) == 0:
+        return get_working_dir(args) / "build" / build_type
+
+    if sys.platform == "win32":
+        return Path(Path.home().drive) / "geoslicerbase" / "build" / build_type
+
+    return Path("/geoslicerbase") / "build" / build_type
+
+
 def only_export_process(args):
     output_directory_path = get_working_dir(args)
     slicer_build_file_path = output_directory_path / "Slicer-build"
@@ -273,7 +329,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--no-export",
         action="store_true",
-        help="Skip application exporting step",
+        help="Skip application exporting to bucket step",
         default=False,
     )
     parser.add_argument(
@@ -309,7 +365,7 @@ if __name__ == "__main__":
         process(args)
     except Exception as error:
         logger.info(f"Found a problem! Cancelling process...")
-        logger.info(f"Error: {error}")
+        logger.info(f"Error: {error}\n{traceback.format_exc()}")
         sys.exit(1)
 
     logger.info(

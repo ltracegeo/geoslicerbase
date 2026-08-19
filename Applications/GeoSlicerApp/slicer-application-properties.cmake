@@ -2,15 +2,18 @@
 set(APPLICATION_NAME
   GeoSlicer
   )
+set(APPLICATION_DISPLAY_NAME
+  "GeoSlicer"
+  )
 
 set(VERSION_MAJOR
   2
   )
 set(VERSION_MINOR
-  2
+  9
   )
 set(VERSION_PATCH
-  2
+  0
   )
 
 set(DESCRIPTION_SUMMARY

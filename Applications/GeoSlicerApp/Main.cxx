@@ -32,7 +32,7 @@ namespace
 int SlicerAppMain(int argc, char* argv[])
 {
   typedef qGeoSlicerAppMainWindow SlicerMainWindowType;
-  
+
   qSlicerApplicationHelper::preInitializeApplication(argv[0], new qAppStyle);
 
   qSlicerApplication app(argc, argv);
@@ -49,7 +49,7 @@ int SlicerAppMain(int argc, char* argv[])
 
   if (!window.isNull())
     {
-    QString windowTitle = QString("%1 %2").arg(Slicer_MAIN_PROJECT_APPLICATION_NAME).arg(Slicer_MAIN_PROJECT_VERSION_FULL);
+    QString windowTitle = QString("%1 %2").arg(Slicer_MAIN_PROJECT_APPLICATION_DISPLAY_NAME).arg(Slicer_MAIN_PROJECT_VERSION_FULL);
     window->setWindowTitle(windowTitle);
     }
 

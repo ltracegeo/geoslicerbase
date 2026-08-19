@@ -1,55 +1,62 @@
-Contributing to GeoSlicer
-===============================
+# Contributing to GeoSlicerBase
 
-There are many ways to contribute to GeoSlicer.
+First off, thank you for considering contributing to GeoSlicerBase!
 
-  * Submit a feature request or bug, or add to the discussion on the [GeoSlicer issue tracker][is]
-  * Submit a [Pull Request][pr] to improve GeoSlicer.
+This document is a guide to help you through the process. We have a few guidelines that we need contributors to follow so that we can have a chance of keeping on top of things.
 
-The PR Process, and Related Gotchas
------------------------------------
+## Code of Conduct
 
-#### How to submit a PR ?
+This project and everyone participating in it is governed by the [GeoSlicer Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior.
 
-If you are new to GeoSlicer development and you don't have push access to the GeoSlicer
-repository, here are the steps:
+## How Can I Contribute?
 
-1. [Fork and clone][fk] the repository.
-3. Create a branch.
-4. [Push][push] the branch to your GitHub fork.
-5. Create a [Pull Request][pr].
+There are many ways to contribute to GeoSlicer, from writing tutorials or blog posts, improving the documentation, submitting bug reports and feature requests or writing code which can be incorporated into GeoSlicer itself.
 
-This corresponds to the `Fork & Pull Model` mentioned in the [GitHub flow](https://guides.github.com/introduction/flow/index.html)
-guides.
+### Reporting Bugs
 
-If you have push access to this repository, you could simply push your branch
-and create a [Pull Request][pr]. This corresponds to the `Shared Repository Model`
-and will facilitate other developers to checkout your topic without having to
-[configure a remote](https://help.github.com/articles/configuring-a-remote-for-a-fork/).
-It will also simplify the workflow when you are _co-developing_ a branch.
+Bugs are tracked as [GitHub issues](https://github.com/ltracegeo/geoslicerbase/issues). Before creating a bug report, please check the list of existing issues to see if the bug has already been reported. If it has, please add a comment to the existing issue instead of creating a new one.
 
-When submitting a PR, make sure to add a `Cc: @GeoSlicer/developers` comment to
-notify GeoSlicer developers of your awesome contributions. Based on the
-comments posted by the reviewers, you may have to revisit your patches.
+When you are creating a bug report, please include as many details as possible. Fill out the required template, the information it asks for helps us resolve issues faster.
 
-### How to integrate a PR ?
+### Suggesting Enhancements
 
-Getting your contributions integrated is relatively straightforward, here
-is the checklist:
+Enhancement suggestions are tracked as [GitHub issues](https://github.com/ltracegeo/geoslicerbase/issues). Before creating an enhancement suggestion, please check the list of existing issues to see if the enhancement has already been suggested. If it has, please add a comment to the existing issue instead of creating a new one.
 
-* All tests pass
-* Consensus is reached. This usually means that at least one reviewer added a `LGTM` comment
-and a reasonable amount of time passed without anyone objecting. `LGTM` is an
-acronym for _Looks Good to Me_.
+When you are creating an enhancement suggestion, please include as many details as possible. Fill out the required template, the information it asks for helps us to better understand the enhancement.
 
-Next, there are two scenarios:
-* You do NOT have push access: A GeoSlicer core developer will integrate your PR.
-* You have push access: Simply click on the "Merge pull request" button.
+### Submitting Pull Requests
 
-Then, click on the "Delete branch" button that appears afterward.
+If you have a bugfix or a new feature that you would like to contribute to GeoSlicerBase, you can do so by sending a pull request. We are always thrilled to receive pull requests, and do our best to process them as fast as we can. Before you start to code, we recommend discussing your plans through a GitHub issue, especially for more ambitious contributions. This gives other contributors a chance to point you in the right direction, give you feedback on your design, and help you find out if someone else is working on the same thing.
+
+#### Pull Request Workflow
+
+1.  **Fork the repository** and create your branch from `master`.
+2.  **Set up your development environment** by following the instructions in the [BUILD.md](BUILD.md) file.
+3.  **Make your changes.**
+4.  **Run the test suite** to ensure that your changes don't break anything.
+    - [Linux instructions](https://slicer.readthedocs.io/en/latest/developer_guide/build_instructions/linux.html#test-slicer)
+    - [Windows instructions](https://slicer.readthedocs.io/en/latest/developer_guide/build_instructions/windows.html#test-slicer)
+5.  **Commit your changes** using a descriptive commit message that follows our [commit message conventions](#commit-message-conventions).
+6.  **Push your branch** to your fork.
+7.  **Open a pull request** to the `master` branch of the main repository.
+
+### Style Guides
+ 
+#### Commit Message Conventions
+
+We use the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification for our commit messages. This allows us to automatically generate changelogs and release notes. Please follow this specification for your commit messages.
+
+Here are some examples:
+
+*   `feat: Add new feature`
+*   `fix: Fix bug`
+*   `docs: Update documentation`
+*   `style: Format code`
+*   `refactor: Refactor code`
+*   `test: Add tests`
+*   `chore: Update build scripts`
 
 
-[fk]: http://help.github.com/forking/
-[push]: https://help.github.com/articles/pushing-to-a-remote/
-[pr]: https://github.com/LTrace/GeoSlicer/merge_requests
-[is]: https://github.com/LTrace/GeoSlicer/issues
+### Code Style
+Follow the [3D Slicer Style Guide](https://slicer.readthedocs.io/en/latest/developer_guide/style_guide.html) for C++ and Python code.
+ 

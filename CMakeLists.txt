@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.16.3)
 
-set(ADDITIONAL_CXX_FLAGS /MP)
-set(ADDITIONAL_C_FLAGS /MP)
 set(Slicer_USE_GIT_PROTOCOL OFF)
 
 if (WIN32)
+  set(ADDITIONAL_CXX_FLAGS /MP)
+  set(ADDITIONAL_C_FLAGS /MP)
   set(CMAKE_CONFIGURATION_TYPES "Release;RelWithDebInfo")
 
   if(NOT DEFINED Qt5_DIR)
@@ -18,6 +18,7 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(EP_GIT_PROTOCOL "https")
 
 # Get the current working directory
 get_filename_component(current_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
@@ -45,7 +46,7 @@ if(NOT DEFINED slicersources_SOURCE_DIR)
   # Download Slicer sources and set variables slicersources_SOURCE_DIR and slicersources_BINARY_DIR
   FetchContent_Populate(slicersources
     GIT_REPOSITORY "${git_remote_url}/slicer.git"
-    GIT_TAG 11c616a2c19df462b7c922fb5d5e8c9140252151
+    GIT_TAG ff2176f0d7f40f6c45ae98a9e7a1189a8c9d28ff
     GIT_PROGRESS 1
     )
 else()
@@ -120,14 +121,14 @@ option(Slicer_BUILD_APPLICATIONUPDATE_SUPPORT   "Build application update suppor
 option(Slicer_BUILD_DOCUMENTATION               "Build documentation (Doxygen, sphinx, ...)"          OFF)
 if(WIN32)
   option(Slicer_BUILD_WIN32_CONSOLE_LAUNCHER    "Build ${PROJECT_NAME} launcher executable as a console app on windows (displays console at application start)" OFF)
-  option(Slicer_BUILD_WIN32_CONSOLE             "Build application executable as a console app"       OFF)
+  option(Slicer_BUILD_WIN32_CONSOLE             "Build application executable as a console app (allows capturing and piping console output)" OFF)
 endif()
 
 option(Slicer_BUILD_DICOM_SUPPORT               "Build application with DICOM support"                ON)
 option(Slicer_BUILD_DIFFUSION_SUPPORT           "Build application with Diffusion support"            ON)
 option(Slicer_BUILD_EXTENSIONMANAGER_SUPPORT    "Build application with ExtensionManager support"     ON)
 option(Slicer_BUILD_MULTIVOLUME_SUPPORT         "Build application with MultiVolume support"          ON)
-option(Slicer_BUILD_PARAMETERSERIALIZER_SUPPORT "Build application with parameter serializer support" ON)
+option(Slicer_BUILD_PARAMETERSERIALIZER_SUPPORT "Build application with parameter serializer support" OFF)
 option(Slicer_USE_PYTHONQT                      "Build application with Python support"               ON)
 option(Slicer_USE_QtTesting                     "Build application with QtTesting support"            ON)
 option(Slicer_USE_SimpleITK                     "Build application with SimpleITK support"            ON)
@@ -154,8 +155,18 @@ option(Slicer_STORE_SETTINGS_IN_APPLICATION_HOME_DIR "Store all settings in the 
 # set(Slicer_CLIMODULES_DISABLED
   # )
 # set(Slicer_QTLOADABLEMODULES_DISABLED
+  # SceneViews
+  # SlicerWelcome
+  # ViewControllers
   # )
 # set(Slicer_QTSCRIPTEDMODULES_DISABLED
+  # DataProbe
+  # DMRIInstall
+  # Endoscopy
+  # LabelStatistics
+  # PerformanceTests
+  # SampleData
+  # VectorToScalarVolume
   # )
 
 # Enable/Disable Slicer custom modules: To create a new module, use the SlicerExtensionWizard.
@@ -167,17 +178,19 @@ set(Slicer_EXTENSION_SOURCE_DIRS
 
 # Add remote extension source directories
 
-# SlicerJupyter
-set(extension_name "SlicerJupyter")
+# SlicerCustomAppUtilities
+set(extension_name "SlicerCustomAppUtilities")
 set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
 FetchContent_Populate(${extension_name}
- SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
- GIT_REPOSITORY https://github.com/fbordignon/SlicerJupyter.git
- GIT_TAG        b586f3b85e5b0e31a9ad3e17ef13419cecd64b16
- GIT_PROGRESS   1
- QUIET
- )
-list(APPEND Slicer_EXTENSION_SOURCE_DIRS ${${extension_name}_SOURCE_DIR})
+  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
+  GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/KitwareMedical/SlicerCustomAppUtilities.git
+  GIT_TAG        1d984a2c9143e2617ff1ffa9d86c51e07dc6321e
+  GIT_PROGRESS   1
+  QUIET
+  )
+message(STATUS "Remote - ${extension_name} [OK]")
+list(APPEND Slicer_EXTENSION_SOURCE_DIRS ${${extension_name}_SOURCE_DIR}/Modules/Scripted/SlicerCustomAppUtilities)
+
 
 # SegmentMesher
 set(extension_name "SegmentMesher")
@@ -238,6 +251,20 @@ FetchContent_Populate(${extension_name}
  QUIET
  )
 list(APPEND Slicer_EXTENSION_SOURCE_DIRS ${${extension_name}_SOURCE_DIR})
+
+# SlicerOpenIGTLink
+#set(extension_name "SlicerOpenIGTLink")
+#set(${extension_name}_SOURCE_DIR "${CMAKE_BINARY_DIR}/${extension_name}")
+#FetchContent_Populate(${extension_name}
+#  SOURCE_DIR     ${${extension_name}_SOURCE_DIR}
+#  GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/openigtlink/SlicerOpenIGTLink.git
+#  GIT_TAG        2b92f7b1ffe02403109b671f28424e8770e902a0
+#  GIT_PROGRESS   1
+#  QUIET
+#  )
+#message(STATUS "Remote - ${extension_name} [OK]")
+#list(APPEND Slicer_EXTENSION_SOURCE_DIRS ${${extension_name}_SOURCE_DIR})
+
 
 # Add Slicer sources
 add_subdirectory(${slicersources_SOURCE_DIR} ${slicersources_BINARY_DIR})
